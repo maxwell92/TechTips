@@ -38,7 +38,6 @@ EOF
 -----------------------------------------------------------
 
 ```bash
-# git clone https://github.com/microservices-demo/microservices-demo
 
 # kubectl apply -f https://git.io/weave-kube
 ```
@@ -63,5 +62,21 @@ EOF
 
 ```bash
 # kubectl create -f https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml
+```
+
+##### 5.3 Watch the process of the Insatallation
+-----------------------------------------------------------
+
+```bash
+# watch "kubectl get pods --namespace=kube-system"
+```
+
+#### (Optional) Deploy a mircoservice demo
+-----------------------------------------------------------
+
+```bash
+# git clone https://github.com/microservices-demo/microservices-demo
+
+# kubectl apply -f microservices-demo/deploy/kubernetes/manifests
 ```
 
