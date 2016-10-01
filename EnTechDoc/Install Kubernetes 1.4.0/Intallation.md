@@ -149,9 +149,11 @@ kubectl apply -f microservices-demo/deploy/kubernetes/manifests
 #### 参考文献及致谢
 -----------------------------------------------------------
 
-* (How we made kubernetes easy to install)[http://blog.kubernetes.io/2016/09/how-we-made-kubernetes-easy-to-install.html]
+* [Installing Kubernetes on Linux with kubeadm](http://kubernetes.io/docs/getting-started-guides/kubeadm/)
 
-* (我们是如何让K8s“巨易”安装的)[https://github.com/maxwell92/TechTips/blob/master/EnTechDoc/k8s-how-we-made-k8s-insanely-easy-to-install/README.md]
+* [How we made kubernetes easy to install](http://blog.kubernetes.io/2016/09/how-we-made-kubernetes-easy-to-install.html)
+
+* [我们是如何让K8s“巨易”安装的](https://github.com/maxwell92/TechTips/blob/master/EnTechDoc/k8s-how-we-made-k8s-insanely-easy-to-install/README.md)
 
 * 感谢Luke Marsden、Weaveworks和SIG-Cluster-lifecycle，感谢他们为社区带来这么好的工具。
 
