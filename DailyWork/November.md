@@ -12,4 +12,5 @@ November
         [x] 安装TunnelBlick后登VPN更新mysql。yong.li-1的TunnelBlick不好使，重新下载了新版的。湖南的mysql里datacenter的host和port有重复，为了添加唯一约束，故将其Host和port均置为0。另外发现SQL脚本里没有给datacenter的name字段增加唯一约束，所以需要检查其他的机器是否已经添加了约束。
     [x] 修改了文档中一处错误，给deployment的pod template里添加metadata的labels字段 
     [x] 尝试了GDB调试golang程序
-    [ ] 检查其他机器是否添加了datacenter表的name的唯一约束
+    [x] 检查其他机器是否添加了datacenter表的name的唯一约束。均有，除了B28没权限检查。
+    [ ] 给gitlab里保存的sql添加相应的sql语句
