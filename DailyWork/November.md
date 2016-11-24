@@ -11,3 +11,4 @@ November
         [x] 升级镜像
         [ ] 安装TunnelBlick后登VPN更新mysql。
     [x] 修改了文档中一处错误，给deployment的pod template里添加metadata的labels字段 
+    [x] 尝试了GDB调试golang程序
