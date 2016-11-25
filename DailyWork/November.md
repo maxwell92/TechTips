@@ -14,3 +14,6 @@ November
     [x] 尝试了GDB调试golang程序
     [x] 检查其他机器是否添加了datacenter表的name的唯一约束。均有，除了B28没权限检查。
     [ ] 给gitlab里保存的sql添加相应的sql语句
+
+20161125
+    [ ] 利用placeholder修改nodeport的为批量插入，需要用到mysql的insert on duplicate key update的batch
