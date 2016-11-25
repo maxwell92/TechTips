@@ -16,4 +16,4 @@ November
     [ ] 给gitlab里保存的sql添加相应的sql语句
 
 20161125
-    [ ] 利用placeholder修改nodeport的为批量插入，需要用到mysql的insert on duplicate key update的batch
+    [x] 利用placeholder修改nodeport的为批量插入和批量软删（update），需要用到mysql的insert on duplicate key update的batch
