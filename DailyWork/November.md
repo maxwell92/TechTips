@@ -17,3 +17,5 @@ November
 
 20161125
     [x] 利用placeholder修改nodeport的为批量插入和批量软删（update），需要用到mysql的insert on duplicate key update的batch
+    [x] 研究每次前端更新后都需要刷新缓存的原因，但是问题没有能够复现。不确定是否解决。了解到了HTTP关于缓存控制的响应头和相关的状态码。
+    [x] 学习了ElasticSearch的基本知识。它可以被看作是数据库。
