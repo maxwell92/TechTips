@@ -44,6 +44,8 @@ SELECT * FROM users WHERE username = ''; DELETE FROM users WHERE 1 or username='
 SELECT * FROM users WHERE name = '\' OR 1 '\';
 SELECT * FROM users WHERE name = '\'; DELETE FROM users WHERE 1 or name = \'';
 
+在golang中，通过[]interface{}类型的变量vals，将每个DOM的成员通过append(vals, u.name, u.age)，然后拼接VALUES(?)，执行stmt.Exec(vals...)的变参来实现bulk。
+
 
 在写代码里SQL语句的时候需要预编译（？形式），需要使用占位符。如果采用字符串拼接的话，例如故意输入某些值使得一个查询语句变成如下的形式，就完成了一次SQL注入：
 ```SQL
