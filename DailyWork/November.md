@@ -2,7 +2,7 @@ November
 =========
 20161124
 
-    [ ] 利用placeholder修改nodeport的为批量插入
+    [x] 利用placeholder修改nodeport的为批量插入， 但是会导致MySQL注入的风险
     [ ] 跟yong.li-1，hong.guo，ming.yan讨论容器云上线方法，发现了三个问题待讨论：
         [ ] 组织和用户的对应。是用户在组织上，还是组织在用户上？是否多对多
         [ ] 取消namespace创建时的limitrange，确定pod的resource是limits还是request及对应的值
@@ -19,3 +19,8 @@ November
     [x] 利用placeholder修改nodeport的为批量插入和批量软删（update），需要用到mysql的insert on duplicate key update的batch
     [x] 研究每次前端更新后都需要刷新缓存的原因，但是问题没有能够复现。不确定是否解决。了解到了HTTP关于缓存控制的响应头和相关的状态码。
     [x] 学习了ElasticSearch的基本知识。它可以被看作是数据库。
+
+20161128
+    [x] 将github上最新的代码（批量插入/删除）迁回gitlab，并测试成功
+    [ ] 整理MySQL注入的内容
+    [ ] 重写批量插入/删除的代码，解决MySQL注入的隐患
