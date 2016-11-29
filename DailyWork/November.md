@@ -28,4 +28,4 @@ November
     [ ] 研究K8s的resource与limits
     [ ] 在master上新建仓库，测试打镜像
     [ ] 修复bug，重新部署
-    [ ] 整理表单的正则
+    [x] 整理表单的正则
