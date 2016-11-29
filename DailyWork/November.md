@@ -24,3 +24,8 @@ November
     [x] 将github上最新的代码（批量插入/删除）迁回gitlab，并测试成功
     [ ] 整理MySQL注入的内容
     [x] 重写批量插入/删除的代码，解决MySQL注入的隐患
+20161129
+    [ ] 研究K8s的resource与limits
+    [ ] 在master上新建仓库，测试打镜像
+    [ ] 修复bug，重新部署
+    [ ] 整理表单的正则
