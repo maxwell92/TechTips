@@ -26,6 +26,7 @@ November
     [x] 重写批量插入/删除的代码，解决MySQL注入的隐患
 20161129
     [ ] 研究K8s的resource与limits
-    [ ] 在master上新建仓库，测试打镜像
+    [ ] 在master上通过ycetestplace/maxwell/current/tmpdeploy下的update.sh脚本生成镜像。每次需要从本地将frontent和backend的代码打包后传到master
+    [ ] 修改了新文档的目录指向
     [ ] 修复bug，重新部署
     [x] 整理表单的正则
