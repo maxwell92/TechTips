@@ -24,9 +24,14 @@ November
     [x] 将github上最新的代码（批量插入/删除）迁回gitlab，并测试成功
     [ ] 整理MySQL注入的内容
     [x] 重写批量插入/删除的代码，解决MySQL注入的隐患
+
 20161129
     [ ] 研究K8s的resource与limits
     [ ] 在master上通过ycetestplace/maxwell/current/tmpdeploy下的update.sh脚本生成镜像。每次需要从本地将frontent和backend的代码打包后传到master
-    [ ] 修改了新文档的目录指向
+    [x] 修改了新文档的目录指向
     [ ] 修复bug，重新部署
     [x] 整理表单的正则
+
+20161130
+    [x] 为test安装了Docker 1.11.2，编写了wiki，安装了go1.7.3，配置了img.reg.3g:15000的证书，导入了ubuntu-v3的基础镜像
+    
