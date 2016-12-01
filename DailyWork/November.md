@@ -29,7 +29,7 @@ November
     [ ] 研究K8s的resource与limits
     [ ] 在master上通过ycetestplace/maxwell/current/tmpdeploy下的update.sh脚本生成镜像。每次需要从本地将frontent和backend的代码打包后传到master
     [x] 修改了新文档的目录指向
-    [ ] 修复bug，重新部署
+    [x] 修复bug，重新部署yong.li-1部署的世纪互联和电信
     [x] 整理表单的正则
 
 20161130
@@ -37,7 +37,7 @@ November
     [x] 研究iris的中间件的使用
     [ ] 编写中间件，用来校验用户提交的JSON。有错误，正在调试    
 20161201
-    [ ] 修改确定新的navList，包含个人中心的修改、nodeport管理、顺序调整，准备更新SQL脚本
+    [x] 修改确定新的navList，包含个人中心的修改、nodeport管理、顺序调整，准备更新SQL脚本，更新创建用户const
     [ ] 完成个人中心修改密码的调试
-    [ ] 完成nodeport管理功能的文档编写及调试
+    [x] 完成nodeport管理功能的文档编写及调试
     [ ] 校验及错误详情的文档编写及调试
