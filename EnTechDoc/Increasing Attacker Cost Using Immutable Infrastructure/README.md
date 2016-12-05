@@ -75,7 +75,7 @@ docker kill pensive_meitner
 docker run -d -p 80:80 --link db:db diogomonica/phphack
 ```
 
-从新访问：
+重新访问：
 
 ![](backinbiz.png)
 
