@@ -11,7 +11,7 @@ December
     [x] 校验及错误详情的文档编写及调试 
 
 20161203
-    [ ] 公众号RESTful API Design文章整理
+    [x] 公众号RESTful API Design文章整理
     [x] 校验及错误详情程序编写
 
 20161205
