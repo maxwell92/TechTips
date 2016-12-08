@@ -23,3 +23,9 @@
 ./scripts/pages/main/controller.js: L65: $state.go('login')
 ./views/main/topology.html
 
+
+------------------------------------------------------------------------------------
+
+delete appManage.....
+common/service.js
+common/controller.js
