@@ -34,3 +34,5 @@ common/controller.js
 
 Add namespace choose list
 both backend
+
+mv html in index.html back to topology.html, accomplishing ng-bind
