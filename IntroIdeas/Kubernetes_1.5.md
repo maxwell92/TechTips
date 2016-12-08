@@ -3,12 +3,12 @@ Kubernetes 1.5
 
 ###主要更新：
 
-* 提升联邦(Federation)支持
+* 联邦(Federation)现已支持
     * Daemonsets
     * Deployments
     * ConfigMaps
 * 简化集群部署
-    * 加强`kubeadm`
+    * 提升`kubeadm`
     * 新命令`kubefed`
     * Master节点高可用(HA)
 * 节点鲁棒性
@@ -19,47 +19,47 @@ Kubernetes 1.5
 ###新特性：
 
 * 应用
-    * [稳定]当RS不能创建Pods时，会通过API报告详细的失败原因。
-    * [稳定]`kubectl apply`现在通过`--prune`参数支持删除不再需要的资源
-    * [Beta]没能通过滚动升级到新版本的Deployments现在通过API说明它们被阻塞。
-    * [Beta]StatefulSets支持持久化或单实例存储的创建和管理。
+    * [Stable]当ReplicaSets不能创建Pods时，它们会通过API报告失败的底层原因。
+    * [Stable]`kubectl apply`现可通过`--prune`参数删除不再需要的资源
+    * [Beta]无法通过滚动升级到新版本的Deployments现可通过API说明它们已被阻塞。
+    * [Beta]StatefulSets允许要求持久化identity或单实例存储的的工作负载通过Kubernetes创建和管理。
     * [Beta]为了提供安全保障，集群不会强行删除未响应节点上的Pods，用户通过CLI强行删除Pods会收到警告。
 * 认证
-    * [Alpha]打磨了基于角色的访问控制alpha版API，包含默认的一组集群角色
-    * [beta]添加了对于Kubelet API认证/授权机制。
+    * [Alpha]改进了包含一组默认的集群角色的RBAC API，
+    * [Beta]添加了对于Kubelet API认证/授权机制。
 * AWS
-    * [Stable]角色应该出现在`kubectl get nodes`的结果里。
+    * [Stable]角色出现在`kubectl get nodes`的结果里。
 * 集群生命周期
-    * [Alpha]提升了`kubeadm`二进制包的交互和可用性，新建一个运行的集群变得更加容易了。
+    * [Alpha]提升了`kubeadm`二进制包的交互和可用性，简化了新建一个运行集群的过程。
 * 集群运维
-    * [Alpha]在GCE上使用kube-up/kube-down脚本添加了创建/移除集群w/高可用（复制）的主节点。
+    * [Alpha]在GCE上使用kube-up/kube-down脚本来添加创建/移除集群高可用（复制）的主节点。
 * 联邦
     * [Beta]支持联邦ConfigMaps。
     * [Alpha]支持Alpha的联邦Daemonsets。
     * [Alpha]支持Alpha的联邦Deployments。
-    * [Alpha]集群联邦添加对于删除选项.孤儿依赖(DeleteOptions.OrphanDependents)的支持，
+    * [Alpha]集群联邦添加对于DeleteOptions.OrphanDependents的支持来开启级联删除。
     * [Alpha]引入`kubefed`命令，简化联邦控制台的部署以及集群注册/注销体验。[文档]()
 * 网络
-    * [Stable]服务可以通过DNS名被其他服务引用，而不是只在pods里。
+    * [Stable]服务可以通过DNS名被其他服务引用，而不是只有在pods里才可以。
     * [Beta]为NodePort类型和LoadBalancer保留源IP的选项。
 * 节点
-    * [Alpha]添加了保留对宿主用户命名空间的访问，当容器运行时里用户命名空间重映射被启用的时候。
-    * [Alpha]引入了v1alpha1版本的CRI(容器运行时接口) API允许可插拔的容器运行时，一个实验用的docker-CRI集成已经就绪，等待测试和反馈。
+    * [Alpha]支持在容器运行时启用用户命名空间重映射的时候，保留对宿主用户命名空间的访问，
+    * [Alpha]引入了v1alpha1版本的CRI(容器运行时接口) API，它允许可插拔的容器运行时。现有一个实验用的已经就绪的docker-CRI集成，请测试和反馈。
     * [Alpha]Kubelet基于QoS层在每个Pod的CGroup层级里启动容器
-    * [Beta]Kubelet集成了memcg提示消息API，来检测硬超过阈值。
-    * [Beta]引入了Beta版的容器化节点一致性测试 gcr.io/google_containers/node-test:0.2，用户来验证node设置。
+    * [Beta]Kubelet集成了memcg提示消息API，来检测超过阈值。
+    * [Beta]引入了Beta版的容器化节点一致性测试: gcr.io/google_containers/node-test:0.2。用户可以来验证node设置。
 * 调度
-    * [Alpha]添加了对于审计不透明的整个资源。
-    * [Beta]PodDisruptionBudget被升级为Beta版，可以用来安全地drain节点，鉴于应用的SLOs
+    * [Alpha]添加了对于不透明整数资源(node级)的审计。
+    * [Beta]PodDisruptionBudget升级为Beta版，可以用来在应用的SLO下安全地drain节点。
 * UI
     * [Stable]Dashboard UI现在显示面向用户的对象及它们的资源使用情况。
 * Windows
     * [Alpha]添加了对Windows Server 2016节点和调度Windows Server Container的支持。
 
-
 ### 显著改变
-* 节点控制器不在从apiServer强行删除pods了
-    * 对于有状态的应用StatefulSet(先前为PetSet)而言，这个改动意味着创建替换的Pods被阻塞，直到旧的Pods确实没有在运行了(意味着kubelet从分区返回，Node对象的删除，云服务商里实例的删除，或强行从apiServer中删除了Pod)。这通过保证不可达的Pod不会被推测为已死帮助阻止了集群应用“脑裂”的场景，除非一些“包围”操作提供了上述之一的情况。
+
+* 节点控制器不再从apiServer强行删除pods
+    * 对于有状态的应用StatefulSet(先前为PetSet)而言，这个改动意味着创建替换的Pods被阻塞，直到旧的Pods确实没有在运行了(意味着kubelet从分区返回，Node对象的删除，云服务商里实例的删除，或强行从apiServer中删除了Pod)。这里通过保证不可达的Pod不会被推测为已死来帮助阻止集群应用“脑裂”的场景，除非一些“包围”操作提供了上述之一的情况。
     * 对于其他已有的除StatefulSet外的控制器，这对于控制器替换Pods没有影响，因为控制器不会重用Pods命名(使用生成的名字generate-name)
     * 用户编写的控制器会重用Pod对象的名字，所以需要考虑这个变化。
 * 允许匿名API服务器的访问，通过授权组系统设置认证的用户
@@ -68,6 +68,7 @@ Kubernetes 1.5
     * 注意：匿名访问默认启用。如果你只依赖认证来授权访问，选择一个授权模式而不是AlwaysAllow，或者将`--anonymous-auth`设为`false`。
 
 ### 升级须知
+
 * batch/v2alpha1.ScheduledJob被重命名为batch/v2alpha1.CronJob。
 * PetSet被重命名为StatefulSet。如果你现在有PetSets，你要在升级为StatefulSets前后进行一些额外的迁移操作，
 * 如果你从v1.4.x升级你的集群联邦组件，请更新你的`federation-apiserver`和`federation-controller-manager`证明为新版本。
