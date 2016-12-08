@@ -35,8 +35,8 @@ Kubernetes 1.5
     * [Alpha]在GCE上使用kube-up/kube-down脚本来创建/移除集群高可用（复制）的主节点。
 * 联邦
     * [Beta]支持联邦ConfigMaps。
-    * [Alpha]支持Alpha的联邦Daemonsets。
-    * [Alpha]支持Alpha的联邦Deployments。
+    * [Alpha]支持联邦Daemonsets。
+    * [Alpha]支持联邦Deployments。
     * [Alpha]集群联邦添加对于DeleteOptions.OrphanDependents的支持来开启级联删除。
     * [Alpha]引入`kubefed`命令，简化联邦控制台的部署以及集群注册/注销体验。[文档]()
 * 网络
