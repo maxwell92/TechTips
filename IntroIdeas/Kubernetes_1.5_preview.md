@@ -15,9 +15,20 @@ Kubernetes集群的部署曾经一直成为诸多初学者最大障碍。而在K
 #### 节点鲁棒性
 Kubernetes可以通过`kubeadm join`轻而易举地为集群添加新的计算节点，而过去对这些节点的认识是它们都必须是Linux操作系统。从1.5开始，提供对于Windows Server 2016节点的支持，同时还可以调度Windows Server Containers，这样用户就可以在Kubernetes上同时运行Linux应用和Windows应用了。同时在1.5版本中，还实现了CRI(容器运行时接口)，以及添加了`kubelet`API调用时的认证和授权。
 
+下面是一些升级之后将会比较显著的改变：
 
-### 新特性：
+* 节点控制器不再从apiServer强行删除pods
+    * 对于有状态的应用StatefulSet(先前为PetSet)而言，这个改动意味着创建替换的Pods被阻塞，直到旧的Pods确实没有在运行了(意味着kubelet从分区返回，Node对象的删除，云服务商里实例的删除，或强行从apiServer中删除了Pod)。这里通过保证不可达的Pod不会被推测为已死来帮助阻止集群应用“脑裂”的场景，除非一些“包围”操作提供了上述之一的情况。
+    * 对于其他已有的除StatefulSet外的控制器，因为控制器不会重用Pods命名(使用生成的名字generate-name)，这对于控制器替换Pods的能力没有影响。
+    * 用户编写的控制器会重用Pod对象的名字，所以需要考虑这个变化。
 
+* 允许匿名API服务器的访问，通过授权组系统设置认证的用户
+    * kube-apiserver添加了--anonymous-auth 参数，默认为true。当它启用时，访问安全端口的请求不会被其他配置的认证方法所拒绝，这些请求被当做匿名请求，并且用户名为`system:anonymous`，组织为`system:unauthenticated`。
+    * 认证的用户被设为`system:authenticated`组。
+    * 注意：匿名访问默认启用。如果你只依赖认证来授权访问，选择一个授权模式而不是AlwaysAllow，或者将`--anonymous-auth`设为`false`。
+
+
+下面列出新特性的目前的版本及说明：
 * 应用
     * [Stable]当ReplicaSets不能创建Pods时，它们会通过API报告失败的底层原因。
     * [Stable]`kubectl apply`现可通过`--prune`参数删除不再需要的资源
@@ -56,19 +67,7 @@ Kubernetes可以通过`kubeadm join`轻而易举地为集群添加新的计算�
 * Windows
     * [Alpha]添加了对Windows Server 2016节点和调度Windows Server Container的支持。
 
-### 显著改变
-
-* 节点控制器不再从apiServer强行删除pods
-    * 对于有状态的应用StatefulSet(先前为PetSet)而言，这个改动意味着创建替换的Pods被阻塞，直到旧的Pods确实没有在运行了(意味着kubelet从分区返回，Node对象的删除，云服务商里实例的删除，或强行从apiServer中删除了Pod)。这里通过保证不可达的Pod不会被推测为已死来帮助阻止集群应用“脑裂”的场景，除非一些“包围”操作提供了上述之一的情况。
-    * 对于其他已有的除StatefulSet外的控制器，这对于控制器替换Pods没有影响，因为控制器不会重用Pods命名(使用生成的名字generate-name)
-    * 用户编写的控制器会重用Pod对象的名字，所以需要考虑这个变化。
-* 允许匿名API服务器的访问，通过授权组系统设置认证的用户
-    * kube-apiserver添加了--anonymous-auth 参数，默认为true。当它启用时，访问安全端口的请求不会被其他配置的认证方法所拒绝，这些请求被当做匿名请求，并且用户名为`system:anonymous`，组织为`system:unauthenticated`。
-    * 认证的用户被设为`system:authenticated`组。
-    * 注意：匿名访问默认启用。如果你只依赖认证来授权访问，选择一个授权模式而不是AlwaysAllow，或者将`--anonymous-auth`设为`false`。
-
-### 升级须知
-
+最后是升级须知：
 * batch/v2alpha1.ScheduledJob被重命名为batch/v2alpha1.CronJob。
 * PetSet被重命名为StatefulSet。如果你现在有PetSets，你要在升级为StatefulSets前后进行一些额外的迁移操作，
 * 如果你从v1.4.x升级你的集群联邦组件，请更新你的`federation-apiserver`和`federation-controller-manager`证明为新版本。
