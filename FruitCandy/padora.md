@@ -29,3 +29,8 @@
 delete appManage.....
 common/service.js
 common/controller.js
+
+--------------------------------------------------
+
+Add namespace choose list
+both backend
