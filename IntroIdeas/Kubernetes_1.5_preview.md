@@ -4,19 +4,19 @@ Kubernetes 1.5新特性预览
 
 在Github上，Kubernetes已拥有接近20,000颗星、6,314次Fork，吸引了国内外众多开发者的青睐，社区异常活跃。那么这次升级Kubernetes又会为我们带来什么样的惊喜？根据官方文档的显示，本次升级将主要围绕以下三项内容进行：
 
-* Federation(联邦)
+#### Federation(联邦)
 目前每个Kubernetes集群还处于一个相对独立的阶段，它们分别运行在指定的数据中心里。不少用户都表示他们希望有个办法能让他们统一管理这些分散开的集群，支持比如跨数据中心这样的场景。集群联邦就提供了这样的功能。
 
 联邦的概念在早期的版本里就有提到，它面临的主要挑战是：本地亲和性、跨集群服务发现、跨集群调度、跨集群迁移等等。社区正在逐步完善对联邦的支持。在Kubernetes 1.5中将会增加对Daemonsets、Deployments和ConfigMaps的支持。
 
-* 简化集群部署 
+#### 简化集群部署 
 Kubernetes集群的部署曾经一直成为诸多初学者最大障碍。而在Kubernetes 1.4里引入了`kubeadm init`和`kubeadm join`两个命令，让Kubernetes可以在任何地方轻松部署。在即将发布的1.5中会除了继续加强`kubeadm`的能力，还会引入新命令`kubefed`，以简化集群联邦的相关操作，最后提供了对于Master节点的HA设置。
 
-* 节点鲁棒性
+#### 节点鲁棒性
 Kubernetes可以通过`kubeadm join`轻而易举地为集群添加新的计算节点，而过去对这些节点的认识是它们都必须是Linux操作系统。从1.5开始，提供对于Windows Server 2016节点的支持，同时还可以调度Windows Server Containers，这样用户就可以在Kubernetes上同时运行Linux应用和Windows应用了。同时在1.5版本中，还实现了CRI(容器运行时接口)，以及添加了`kubelet`API调用时的认证和授权。
 
 
-###新特性：
+### 新特性：
 
 * 应用
     * [Stable]当ReplicaSets不能创建Pods时，它们会通过API报告失败的底层原因。
