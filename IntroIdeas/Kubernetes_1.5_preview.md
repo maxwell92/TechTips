@@ -16,7 +16,6 @@ Kubernetes集群的部署曾经一直成为诸多初学者最大障碍。而在K
 Kubernetes可以通过`kubeadm join`轻而易举地为集群添加新的计算节点，而过去对这些节点的认识是它们都必须是Linux操作系统。从1.5开始，提供对于Windows Server 2016节点的支持，同时还可以调度Windows Server Containers，这样用户就可以在Kubernetes上同时运行Linux应用和Windows应用了。同时在1.5版本中，还实现了CRI(容器运行时接口)，以及添加了`kubelet`API调用时的认证和授权。
 
 下面是一些升级之后将会比较显著的改变：
-
 * 节点控制器不再从apiServer强行删除pods
     * 对于有状态的应用StatefulSet(先前为PetSet)而言，这个改动意味着创建替换的Pods被阻塞，直到旧的Pods确实没有在运行了(意味着kubelet从分区返回，Node对象的删除，云服务商里实例的删除，或强行从apiServer中删除了Pod)。这里通过保证不可达的Pod不会被推测为已死来帮助阻止集群应用“脑裂”的场景，除非一些“包围”操作提供了上述之一的情况。
     * 对于其他已有的除StatefulSet外的控制器，因为控制器不会重用Pods命名(使用生成的名字generate-name)，这对于控制器替换Pods的能力没有影响。
