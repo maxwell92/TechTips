@@ -32,7 +32,7 @@ Kubernetes 1.5
 * 集群生命周期
     * [Alpha]提升了`kubeadm`二进制包的交互和可用性，简化了新建一个运行集群的过程。
 * 集群运维
-    * [Alpha]在GCE上使用kube-up/kube-down脚本来添加创建/移除集群高可用（复制）的主节点。
+    * [Alpha]在GCE上使用kube-up/kube-down脚本来创建/移除集群高可用（复制）的主节点。
 * 联邦
     * [Beta]支持联邦ConfigMaps。
     * [Alpha]支持Alpha的联邦Daemonsets。
