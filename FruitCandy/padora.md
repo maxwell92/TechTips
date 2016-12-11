@@ -36,3 +36,12 @@ Add namespace choose list
 both backend
 
 mv html in index.html back to topology.html, accomplishing ng-bind
+
+---------------------------------------------------------------------
+
+padora:
+
+1. get all namespace list from k8s api then return back to frontend (default is default)
+2. frontend request with selected namespace
+3. return topology relations to frontend 
+
