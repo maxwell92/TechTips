@@ -16,16 +16,19 @@ November
     [ ] 给gitlab里保存的sql添加相应的sql语句
 
 20161125
+
     [x] 利用placeholder修改nodeport的为批量插入和批量软删（update），需要用到mysql的insert on duplicate key update的batch
     [x] 研究每次前端更新后都需要刷新缓存的原因，但是问题没有能够复现。不确定是否解决。了解到了HTTP关于缓存控制的响应头和相关的状态码。
     [x] 学习了ElasticSearch的基本知识。它可以被看作是数据库。
 
 20161128
+
     [x] 将github上最新的代码（批量插入/删除）迁回gitlab，并测试成功
     [ ] 整理MySQL注入的内容
     [x] 重写批量插入/删除的代码，解决MySQL注入的隐患
 
 20161129
+
     [ ] 研究K8s的resource与limits
     [ ] 在master上通过ycetestplace/maxwell/current/tmpdeploy下的update.sh脚本生成镜像。每次需要从本地将frontent和backend的代码打包后传到master
     [x] 修改了新文档的目录指向
@@ -33,6 +36,7 @@ November
     [x] 整理表单的正则
 
 20161130
+
     [x] 为test安装了Docker 1.11.2，编写了wiki，安装了go1.7.3，配置了img.reg.3g:15000的证书，导入了ubuntu-v3的基础镜像
     [x] 研究iris的中间件的使用
     [ ] 编写中间件，用来校验用户提交的JSON。有错误，正在调试    
