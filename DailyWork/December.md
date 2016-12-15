@@ -55,3 +55,8 @@ December
     [x] 人肉测试检查bug，尤其是环境变量处
     [x] 为FindNewRs()和镜像管理处添加nil返回结果的处理，目前仅支持错误信息提示
     [x] 检查其他bug，维护特性和bug表，并提交处理
+
+20161215
+    [x] 检查、整理bug
+    [x] 上线mingzong.liu的netpay应用
+    [x] 上线m6的新yce
