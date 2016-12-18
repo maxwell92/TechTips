@@ -69,7 +69,7 @@ Events的数据结构定义里同样包含了`metav1.TypeMeta`和`ObjectMeta`，
 
 ![](Kubelet-show)
 
-回想一下kubelet的作用是：负责管理和维护在这台主机上运行着的所有容器，维持pod的运行状态(status)和它的期望值(spec)一致。kubelet启动时，会加载它本身的配置信息、接入容器运行时(Docker或Rkt)、以及定义kubelet与整个集群进行交互所需的信息。在启动后，会进行一系列的初始化工作，创建ContainerManager、设置OOMScoreAdj值、创建DiskSpaceManager、PodManager等等。那么会不会是kubelet为这个Pod创建了该Events呢？
+回想一下kubelet的作用是：负责管理和维护在这台主机上运行着的所有容器，维持pod的运行状态(status)和它的期望值(spec)一致。kubelet启动时，会加载它本身的配置信息、接入容器运行时(Docker或Rkt)、以及定义kubelet与整个集群进行交互所需的信息。在启动后，会进行一系列的初始化工作，创建ContainerManager、设置OOMScoreAdj值、创建DiskSpaceManger、PodManager等等。那么会不会是kubelet为这个Pod创建了该Events呢？
 
 为了解答这个问题，不得不祭出究极“源码大法”。
 
@@ -82,7 +82,6 @@ const (
     ErrImageNeverPullPolicy = "ErrImageNeverPull"
     BackOffPullImage        = "BackOff"
     FailedSync = "FailedSync"
-    ...
 )
 ```
 
@@ -180,15 +179,19 @@ func (recorder *recorderImpl) makeEvent(ref *api.ObjectReference, eventtype, rea
 }
 
 ```
-到此恍然大悟，原来前面所说的Events的命名规则："发生该Events的Pod名称" + "." + "神秘数字串"实际上是"ref.Name" + "." + "t.UnixNano())"。
-
-终于找到了Events的真身，原来它是Kubelet负责用来记录多个容器运行过程中的事件，命名由被记录的对象和时间戳构成。前面看起来难以捉摸的表现最终还是逃不过火眼金睛。到此Kubernetes Events之捉妖记（上）解决了Events从哪儿来的问题，暂告一段落。在下篇中将对Events关于到哪儿去、怎么根据Pod找到对应的等进行深度拷问。欢迎继续关注！
 
 
-参考经卷及说明
+
+ 
+
+
+
+
+
+参考资料及说明
 ------------
-* [Docker容器与容器云 浙江大学SEL实验室著](https://item.jd.com/12052716.html)
-* [Kubernetes 1.2源码](https://github.com/kubernetes/kubernetes)
+* Docker容器与容器云
+* Kubernetes 1.2源码
 
 本文中出现的*curl 之刃*、*json宝典*、*源码大法*均属于为了轻松阅读体验而凭空捏造的词汇，分别对应*用命令行工具curl进行访问和实验*、*查看该对象的json信息*、*阅读源码寻找答案释疑*。
 
