@@ -5,7 +5,7 @@ Kubernetes Events之捉妖记（上）
 --------
 前些天群里有位同学提问说怎么通过API得到`kubectl describe pod`的结果，我立刻找到了Kubernetes相关的API并回复他，但他说这不是他要的东西。经过一番描述，我才了解到他想要的是原来如下图中红框里的信息：
 
-![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/kube-events.jpg)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/kube-events.png)
 
 Message属于Kubernetes的一种特殊的资源：Events。老实讲，我以前是没有怎么注意过这个Events是怎么来的，甚至一直觉得它应该是Pod的一部分。那么这个Events到底是什么样的资源？它从何而来？下面随我一起踏上捉妖之途。
 
