@@ -74,5 +74,5 @@ December
 20161220
    
     [x] 解决缓存的问题
-    [x] 编写新的deployment列表文档和代码 
+    [x] 编写新的deployment列表文档和代码，添加了svcName显示
     [x] 测试172上的改bug版，并发布到m6
