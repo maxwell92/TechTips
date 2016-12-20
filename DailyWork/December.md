@@ -64,9 +64,13 @@ December
     [x] 上线mingzong.liu的netpay应用
     [x] 上线m6的新yce
 
-20161217
+20161219
 
     [x] 编写测试用例（用户的主要操作流：从模板创建，5个用户故事，文档，uml和测试数据）
     [ ] 编写测试用例（用户的异常操作流） 
     [x] 帮助dawei完成前端的gitlab-ci流
     [x] 帮助mingzong.liu更新3个应用，又将frontend-hessian停机（删除实例，服务保留）
+
+20161220
+   
+    [x] 解决缓存的问题
