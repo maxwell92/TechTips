@@ -85,3 +85,4 @@ December
     [x] 帮mingzong.liu更新netpay-hessian和installment-hessian
     [x] OKR自评
     [x] 编写重启实例后台
+    [x] 帮mingzong.liu再次更新installment-hessian
