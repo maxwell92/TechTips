@@ -76,3 +76,10 @@ December
     [x] 解决缓存的问题
     [x] 编写新的deployment列表文档和代码，添加了svcName显示
     [x] 测试172上的改bug版，并发布到m6
+    [x] 翻译K8s CRI blog
+
+20161221
+
+    [x] 报销单
+    [x] 审校K8s CRI blog译文
+    [x] 帮mingzong.liu更新netpay-hessian和installment-hessian
