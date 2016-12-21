@@ -84,3 +84,4 @@ December
     [x] 审校K8s CRI blog译文
     [x] 帮mingzong.liu更新netpay-hessian和installment-hessian
     [x] OKR自评
+    [x] 编写重启实例后台
