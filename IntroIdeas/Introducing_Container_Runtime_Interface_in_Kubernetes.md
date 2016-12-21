@@ -18,7 +18,7 @@ Kubernetes节点的最底层是一个负责容器启停的软件，我们把它�
 
 通过Unix 套接字或者gRPC框架，Kubelet与容器运行时通信（或者是CRI插件填充了容器运行时），这时Kubelet就像是客户端，而CRI插件就像对应的服务器。
 
-![]()
+![](overview-cri.png)
 
 protocol buffers [API](https://github.com/kubernetes/kubernetes/blob/release-1.5/pkg/kubelet/api/v1alpha1/runtime/api.proto)包含了两个gRPC服务：ImageService和RuntimeService。ImageService提供了从镜像仓库拉镜像的RPC，查看，和移除镜像。RuntimeSerivce包含了管理Pods和容器生命周期的RPC，以及跟容器交互的调用(exec/attach/port-forward)。一个单块的容器运行时能够管理镜像和容器（例如：Docker和Rkt），并且通过同一个套接字同时提供这两种服务。这个套接字可以在Kubelet里通过标识--container-runtime-endpoint和--image-service-endpoint标识进行设置。
 
