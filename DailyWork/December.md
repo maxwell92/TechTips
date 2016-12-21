@@ -83,3 +83,4 @@ December
     [x] 报销单
     [x] 审校K8s CRI blog译文
     [x] 帮mingzong.liu更新netpay-hessian和installment-hessian
+    [x] OKR自评
