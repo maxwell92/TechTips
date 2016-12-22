@@ -1,0 +1,4 @@
+#yetanothermodule
+
+import module
+main()
