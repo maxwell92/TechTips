@@ -140,9 +140,10 @@ func (d *PodDescriber) Describe(namespace, name string, describerSettings Descri
 3. 获取Pod成功，GetReference()成功
   GetReference()成功后，调用Events的Search()方法，寻找关于该Pod的所有Events。最终执行describePod()，并将目前获取的结果输出到屏幕上。
 
-当然，即使是Events的Search()方法，内部执行的仍是先GetFieldSelector()再Events List()的过程。这是因为DockerManager在生成Event的时候会调用它的makeEvent()方法（代码在上篇引用过，这里不再赘述），将Pod关联到该Events的InvolvedObject上，所以可以被选中。
+当然，即使是Events的Search()方法，内部执行的仍是先GetFieldSelector()再Events List()的过程。这是因为DockerManager在生成Event的时候会调用它的makeEvent()方法（代码在上篇引用过，这里不再赘述），将Pod关联到该Events的InvolvedObject上。GetFieldSelector()返回的是一个field.Selector接口实例，它定义在kubernetes/pkg/fields/selector.go里，通过它的Matches()方法可以选中含有该Field且对应值相同的Events。
 
-Events的来龙已经摸清，
+在Kubernetes里，FieldSelector和LabelSelector的设计异曲同工，不同的是Field匹配的是该资源的域，比如Name、Namespace，而Label匹配的是Labels域里的键值对。
+
 
 参考经卷及说明
 ------------
