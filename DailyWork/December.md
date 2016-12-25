@@ -92,3 +92,8 @@ December
 
     [x] 协助开发Feature-0022
     [ ] 调研testify, FSM
+
+20161223
+    
+    [x] 开发Feature-0024 
+    [ ] 测试testify, 编写测试demo
