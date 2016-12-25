@@ -87,6 +87,8 @@ Describe()方法首先通过namespace和name唯一确定所请求的Pod。如果
 
 到此我们已经摸清了Events的来龙。具体来说对于`describe pod`时看到的Events，它是由Kubelet的DockerManager生成，在执行`kubectl`命令时通过PodDescriber进行采集。显然如果我们不执行`kubectl`命令的时候这些Events仍然是存在的，那么这个时候这些Events会流向何处？也就说，我们还没捋顺Events的去脉。
 
+Kubelet在启动的时候会初始化一个EventRecorder，这个EventRecorder又被交于Kubelet上每个小manager使用，比如DockerManager。它将产生的Events的Source成员进行初始化：Componets为“kubelet”，Host为该节点的名字。
+
 
 #### 狡兔三窟
 

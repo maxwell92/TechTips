@@ -2,6 +2,9 @@ EventsSink
 EventCompress
 Event ETCD
 https://github.com/kubernetes/kubernetes/blob/master/docs/design/event_compression.md
+Source kubelet pkg/cmd/kubelet/app
+/Users/yp-tc-m-7019/mworks/yce-backend/src/k8s.io/kubernetes/cmd/kubelet/app/server.go
+
 Conclusion
 
 
