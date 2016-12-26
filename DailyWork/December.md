@@ -97,3 +97,7 @@ December
     
     [x] 开发Feature-0024 
     [ ] 测试testify, 编写测试demo
+
+20161226
+
+    [x] 为mingzong.liu更新installment
