@@ -100,4 +100,4 @@ December
 
 20161226
 
-    [x] 为mingzong.liu更新installment
+    [x] 为mingzong.liu更新installment 2次
