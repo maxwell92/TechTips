@@ -100,4 +100,6 @@ December
 
 20161226
 
-    [x] 为mingzong.liu更新installment 2次
+    [x] 为mingzong.liu更新installment 3次
+    [x] 整理测试自查列表并推广
+    [x] 给后台每个ReadJSON添加对应的log.Error
