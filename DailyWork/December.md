@@ -110,3 +110,5 @@ December
 
     [x] 整理apis.sh结果
     [x] 为mingzong.liu更新installment
+    [x] 整理APIv2
+    [x] 测试
