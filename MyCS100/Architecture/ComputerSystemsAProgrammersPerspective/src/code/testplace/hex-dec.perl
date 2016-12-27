@@ -1,4 +1,4 @@
-#! /usr/local/bin/perl
+#! /usr/bin/perl
 # Convert list of hex numbers into decimal
 
 for ($i = 0; $i < @ARGV; $i++) {
