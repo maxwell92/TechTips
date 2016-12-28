@@ -115,4 +115,6 @@ December
 
 20161228
     
-    [x] 为mingzong.liu更新installment 和 netpay
+    [x] 为mingzong.liu更新installment 和 netpay: 2次
+    [x] 更新yce 0.6.2
+    
