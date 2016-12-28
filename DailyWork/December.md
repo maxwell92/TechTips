@@ -112,3 +112,7 @@ December
     [x] 为mingzong.liu更新installment
     [x] 整理APIv2
     [x] 测试
+
+20161228
+    
+    [x] 为mingzong.liu更新installment 和 netpay
