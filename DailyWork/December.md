@@ -119,3 +119,9 @@ December
     [x] 为mingzong.liu上生产内测installment 和 netpay
     [x] 更新yce 0.6.2
     
+
+20161229
+    
+    [x] 填表
+    [x] 跟lu.hou交接CI/CD
+    [x] 测试yce v0.6.2，编写Release Note
