@@ -125,3 +125,5 @@ December
     [x] 填表
     [x] 跟lu.hou交接CI/CD
     [x] 测试yce v0.6.2，编写Release Note
+    [x] netpay电信和b28上production
+    [x] 编写image sync agent
