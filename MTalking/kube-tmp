@@ -7,8 +7,9 @@ Source kubelet pkg/cmd/kubelet/app
 
 Conclusion
 
+kubernetes/pkg/watch/mux.go
 
- 
+Event 跟 etcd的list-watch机制下的event不一样 
 
 
 
