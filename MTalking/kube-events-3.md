@@ -1,9 +1,10 @@
 Kubernetes Events之捉妖记（下）
 ==================
 
-经过前两回的“踏雪寻妖”，一个完整的Events原形逐渐浮出水面。我们已经摸清了它的由来和身世，本回将是系列最后一篇，一起探索Events的去向。一个终点，是另一个起点。
+经过前两回的“踏雪寻妖”，一个完整的Events原形逐渐浮出水面。我们已经摸清了它的由来和身世，本回将一起探索Events的去向，是一个终点，又是另一个起点。
 
 #### 蜜汁去向
+
 前面已经了解到，Event是由一个叫EventRecorder的东西幻化而生。通过研究源码经典发现，在Kubelet启动的时候获取一个EventBroadcaster的实例，以及根据KubeletConfig获取一个EventRecorder实例。EventRecorder自不必多说。EventBroadcaster用来接收Event并且把它们转交给EventSink、Watcher和Log。
 
 EventBroadcaster定义了包括四个方法的一组接口，分别是：
