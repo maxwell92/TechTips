@@ -1,7 +1,7 @@
 Kubernetes Events之捉妖记（下）
 ==================
 
-经过前两回的“踏雪寻妖”，一个完整的Events原形逐渐浮出水面。我们已经摸清了它的由来和身世，本回将是系列最后一篇，一起探索Events的去向。
+经过前两回的“踏雪寻妖”，一个完整的Events原形逐渐浮出水面。我们已经摸清了它的由来和身世，本回将是系列最后一篇，一起探索Events的去向。一个终点，是另一个起点。
 
 #### 蜜汁去向
 前面已经了解到，Event是由一个叫EventRecorder的东西幻化而生。通过研究源码经典发现，在Kubelet启动的时候获取一个EventBroadcaster的实例，以及根据KubeletConfig获取一个EventRecorder实例。EventRecorder自不必多说。EventBroadcaster用来接收Event并且把它们转交给EventSink、Watcher和Log。
@@ -34,7 +34,7 @@ EventBroadcaster由定义在kubernetes/pkg/client/record/event.go里的NewBroadc
 
 StartRecordingToSink()方法先根据当前时间生成一个随机数发生器randGen，接着实例化一个EventCorrelator，最后将recordToSink()函数作为处理函数，实现了StartEventWatcher。StartLogging()类似地将用于输出日志的匿名函数作为处理函数，实现了StartEventWatcher。
 
-#### StartEventWatcher
+#### 总钻风StartEventWatcher
 
 StartEventWatcher()首先实例化watcher，每个watcher都被塞入该Broadcaster的watcher列表中，并且新实例化的watcher只能获得后续的Events，不能获取整个Events历史。入队列的时候加锁以保证安全。接着启动一个goroutine用来监视Broadcaster发来的Events。EventBroadcaster会在分发Event的时候将所有的Events都送入一个ResultChan。watcher不断从ResultChan取走每个Event，如果获取过程发送错误，将Crash并记录日志。否则在获得该Events后，交于对应的处理函数进行处理。
 
@@ -42,7 +42,7 @@ StartEventWatcher()方法使用recordToSink()函数作为处理。因为同一�
 
 recordEvent()方法试着将Event写到对应的EventSink里，如果写成功或可无视的错误将返回true，其他错误返回false。如果要写入的Event已经存在，就将它更新，否则创建一个新的Event。在这个过程中如果出错，不管是构造新的Event失败，还是服务器拒绝了这个event，都属于可无视的错误，将返回true。而HTTP传输错误，或其他不可预料的对象错误，都会返回false，并在上一层函数里进行重试。在kubernetes/pkg/client/record/event.go里指定了单个Event的最大重试次数为12次。另外，为了避免在master挂掉之后所有的Event同时重试导致不能同步，所以每次重试的间隔时间将随机产生(第一次间隔由前面的随机数发生器randGen生成)。
 
-#### EventCorrelator
+#### 小钻风EventCorrelator
 
 EventCorrelator定义包含了三个成员，分别是过滤Events的filterFunc，进行Event聚合的aggregator以及记录Events的logger。它负责处理收到的所有Events，并执行聚合等操作以防止大量的Events冲垮整个系统。它会过滤频繁发生的相似Events来防止系统向用户发送难以区分的信息和执行去重操作，以使相同的Events被压缩为被多次计数单个Event。
 
@@ -150,7 +150,21 @@ Thu, 12 Feb 2015 01:13:20 +0000   Thu, 12 Feb 2015 01:13:20 +0000   1           
 
 ```
 
+#### 小结
+
+到此基本上捋出了Events的来龙去脉：Event由Kubernetes的核心组件Kubelet和ControllerManager等产生，用来记录系统一些重要的状态变更。ControllerManager里包含了一些小controller，比如deployment_controller，它们拥有EventBroadCaster的对象，负责将采集到的Event进行广播。Kubelet包含一些小的manager，比如docker_manager，它们会通过EventRecorder输出各种Event。当然，Kubelet本身也拥有EventBroadCaster对象和EventRecorder对象。
+
+EventRecorder通过generateEvent()实际生成各种Event，并将其添加到监视队列。我们通过`kubectl get events`看到的NAME并不是Events的真名，而是与该Event相关的资源的名称，真正的Event名称还包含了一个时间戳。Event对象通过InvolvedObject成员与发生该Event的资源建立关联。Kubernetes的资源分为“可被描述资源”和“不可被描述资源”。当我们`kubectl describe`可描述资源，比如Pod时，除了获取Pod的相应信息，还会通过FieldSelector获取相应的Event列表。Kubelet在初始化的时候已经指明了该Event的Source为Kubelet。
+
+EventBroadcaster会将收到的Event交于各个处理函数进行处理。接收Event的缓冲队列长为25，不停地取走Event并广播给各个watcher。watcher由StartEventWatcher()实例产生，并被塞入EventBroadcaster的watcher列表里，后实例化的watcher只能获取后面的Event历史，不能获取全部历史。watcher通过recordEvent()方法将Event写入对应的EventSink里，最大重试次数为12次，重试间隔随机生成。
+
+在写入EventSink前，会对所有的Events进行聚合等操作。将Events分为相同和相似两类，分别使用EventLogger和EventAggregator进行操作。EventLogger将相同的Event去重为1个，并通过计数表示它出现的次数。EventAggregator将对10分钟内出现10次的Event进行分组，依据是Event的Source、InvolvedObject、Type和Reason域。这样可以避免系统长时间运行时产生的大量Event冲击etcd，或占用大量内存。EventAggregator和EventLogger采用大小为4096的LRU Cache，存放先前已产生的不重复Events。超出Cache范围的Events会被压缩。
+
 #### 后记
+
+这篇文章共150行文字，虽然我写了整整一天，但是并没有成为“捉妖”系列的完美收官之作，系列三篇文章也仍没有完完整整地梳理出Event的全貌。一个小小的Event研究起来却这么复杂，让我想起探花兄曾经说过“我们要时刻保持敬畏之心，不管对人还是对技术”。不管是学术上，还是工程上，每种技术的实现和发展无不凝聚了很多人的智慧和汗水，Kubernetes这样庞大的系统更是。我还只是刚“识字”的初学者，更有必要时刻保持敬畏之心。跟Event的故事仍未完结，后面的文章会继续围绕Event展开，敬请关注！
+
+
 参考经卷
 ------------
 * [Docker容器与容器云 浙江大学SEL实验室著](https://item.jd.com/12052716.html)
