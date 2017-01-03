@@ -1,0 +1,1 @@
+ netstat -antolp|grep established
