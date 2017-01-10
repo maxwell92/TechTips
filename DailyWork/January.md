@@ -1,4 +1,5 @@
-20170103
+2
+170103
 
     [x] 整理需求和bug完成情况
     [x] 帮mingzong.liu上线frontent-hessian到qa
@@ -29,3 +30,9 @@
 
     [x] 编写同步镜像agent
     [x] 前后联调
+
+20170110
+
+    [ ] 前后联调（bug，feature）
+    [ ] 多数据中心管理
+    [ ] K8s major release
