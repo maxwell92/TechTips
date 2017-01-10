@@ -37,3 +37,4 @@
     [x] 多数据中心管理，手动创建组织，发现bug
     [ ] K8s major release
     [x] 帮mingzong.liu更新frontend QA，不需要手动build，直接更新镜像 
+    [ ] 研究iris websocket，继续解决粘连问题
