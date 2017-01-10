@@ -34,5 +34,5 @@
 20170110
 
     [ ] 前后联调（bug，feature）
-    [ ] 多数据中心管理
+    [x] 多数据中心管理，手动创建组织，发现bug
     [ ] K8s major release
