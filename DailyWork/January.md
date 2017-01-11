@@ -44,3 +44,5 @@
     [x] 研究iris websocket，继续解决粘连问题
     [x] 雏鹰培训
     [x] 帮mingzong.liu上线frontend-installment-hessian到生产（兆维和b28）
+    [x] rewrite siAgent using normal router
+    [ ] 整理多数据中心问题
