@@ -38,3 +38,8 @@
     [ ] K8s major release
     [x] 帮mingzong.liu更新frontend QA，不需要手动build，直接更新镜像 
     [ ] 研究iris websocket，继续解决粘连问题
+
+20170111
+
+    [ ] 研究iris websocket，继续解决粘连问题
+    [ ] 雏鹰培训
