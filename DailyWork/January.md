@@ -41,5 +41,6 @@
 
 20170111
 
-    [ ] 研究iris websocket，继续解决粘连问题
-    [ ] 雏鹰培训
+    [x] 研究iris websocket，继续解决粘连问题
+    [x] 雏鹰培训
+    [x] 帮mingzong.liu上线frontend-installment-hessian到生产（兆维和b28）
