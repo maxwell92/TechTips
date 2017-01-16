@@ -1,23 +1,21 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
-	"strings"
-	//    "strconv"
-	"crypto/md5"
-	"io"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
 func sayhelloName(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	//注意:如果没有调用ParseForm方法, 下面无法获取表单数据
 	fmt.Println(r.Form)
 	fmt.Println("path", r.URL.Path)
 	fmt.Println("scheme", r.URL.Scheme)
@@ -34,7 +32,6 @@ func sayhelloName(w http.ResponseWriter, r *http.Request) {
 
 func login(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	//注意:如果没有调用ParseForm方法, 下面无法获取表单数据
 
 	fmt.Println("method:", r.Method)
 	if r.Method == "GET" {
@@ -42,22 +39,16 @@ func login(w http.ResponseWriter, r *http.Request) {
 		h := md5.New()
 		io.WriteString(h, strconv.FormatInt(crutime, 10))
 		token := fmt.Sprintf("%x", h.Sum(nil))
-		//token := fmt.Sprintf("%x", h.Sum(strconv.FormatInt(crutime, 10)))
 
 		fmt.Println(token)
 
 		t, _ := template.ParseFiles("login.gtpl")
 		t.Execute(w, token)
-		//t.Execute(w, nil)
 	} else {
 
 		if len(r.Form["password"][0]) < 5 {
 			fmt.Fprintf(w, "password too short\n")
 		}
-
-		/*if _, err := strconv.Atoi(r.Form.Get("age")); err != nil {
-		    fmt.Fprintf(w, "Age must be number!")
-		}*/
 
 		if m, _ := regexp.MatchString("^[a-zA-Z]+$", r.Form.Get("username")); !m {
 			fmt.Fprintf(w, "username must be English\n")
@@ -74,7 +65,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 		if m, _ := regexp.MatchString(`^([\w\.\_]{2, 10})@(\w{1,}).([a-z]{2,4})$`, r.Form.Get("email")); !m {
 			fmt.Fprintf(w, "email must be email!\n")
 		}
-		//注意:正则表达式""和``的区别
 
 		slice := []string{"apple", "pear", "banana"}
 		for _, v := range slice {
@@ -90,13 +80,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		/*islice := []string{"football", "basketball", "tennis"}
-		  a := Slice_diff(r.Form["interest"], slice)
-		  if a == nil {
-		      fmt.Fprintln(w, a)
-		  }*/
-		//注意:Slice_diff 来自库github.com/astaxie/beeku
-
 		token := r.Form.Get("token")
 		if token != "abc" {
 			fmt.Printf("token: %s\n", token)
@@ -106,8 +89,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Println("username:", r.Form["username"])
 		fmt.Println("username length:", len(r.Form["username"][0]))
-		//fmt.Println("password:", r.Form["password"])
-		//fmt.Println("usernaem:", template.HTMLEscapeString(r.Form.Get("username")))
 		fmt.Println("password:", template.HTMLEscapeString(r.Form.Get("password")))
 		fmt.Println("age:", r.Form["age"])
 		fmt.Println("realname:", r.Form["realname"])
