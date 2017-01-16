@@ -55,4 +55,7 @@
 
     [x] rewrite siAgent using normal yce controller as proxy
 
-    [x] rewrite siAgent
+20170116
+
+    [ ] 测试siAgent代码，前后联调
+    [ ] 准备golang分享   
