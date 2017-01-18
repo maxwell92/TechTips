@@ -101,3 +101,4 @@ No
 [](https://talks.golang.org/2015/go-for-java-programmers.slide#14)
 [](https://talks.golang.org/2016/applicative.slide#13)
 [](https://talks.golang.org/2015/simplicity-is-complicated.slide#11)
+[](http://www.dockerinfo.net/4123.html)
