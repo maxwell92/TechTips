@@ -1,7 +1,7 @@
 ```golang
     // main
     ...
-    client, err := rpc.DialHTTP("tcp", serverAddress+":1234")
+    client, err := rpc.DialHTTP("tcp", "localhost:8080")
     err = client.Call("Arith.Multiply", args, &reply)
     ...
 ```
@@ -12,7 +12,7 @@
     ...
     rpc.Register(arith)
     rpc.HandleHTTP()
-    err := http.ListenAndServe(":1234", nil)
+    err := http.ListenAndServe(":8080", nil)
     ...
 
     // Multiply
