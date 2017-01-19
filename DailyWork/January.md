@@ -57,5 +57,21 @@
 
 20170116
 
-    [ ] 测试siAgent代码，前后联调
+    [x] 测试siAgent代码，前后联调
+    [x] 准备golang分享   
+20170117
+
+    [x] 前后联调
+    [x] 准备golang分享   
+
+20170118
+
     [ ] 准备golang分享   
+
+20170119
+
+    [ ] yce讨论上期和下期功能
+    [ ] 更新master，分离admin和normal SQL
+    [ ] k8s 梳理
+    [ ] QA更新
+
