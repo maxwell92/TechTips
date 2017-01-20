@@ -72,6 +72,12 @@
 
     [x] yce讨论上期和下期功能
     [x] 更新master，分离admin和normal SQL
-    [ ] k8s 梳理
+    [x] k8s 梳理
     [x] QA更新
+
+20170120
+
+    [ ] k8s梳理
+    [ ] yce梳理
+    [ ] 译文校对 
 
