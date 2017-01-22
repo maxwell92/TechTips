@@ -1,32 +1,37 @@
 Clustered RabbitMQ on Kubernetes
 ===============================
 
-在Kubernetes上搭建RabbitMQ有很多方法。今天将为大家分享我们在Fuel CCP项目上集群化RabbitMQ时踩过的那些坑。这些坑大部分都很常见，如果你想提出你的解决方案，你应该可以从本文中获得灵感。
+有很多方法可以让我们搭建Kubernetes上的RabbitMQ集群。今天将为大家分享我们在Fuel CCP项目上搭建RabbitMQ集群时踩过的那些坑。这些坑在大多数搭建方法里都会遇到，如果你想提出你的解决方案，你应该可以从本文中获得灵感。
 
-### 命名你的兔子
-在Kubernetes上运行RabbitMQ带来一系列有趣的问题。首要的问题就是我们该如何给兔子命名，好让它们能相互发现？下面是一些可以参考的命名例子：
+### 节点命名
+在Kubernetes上运行RabbitMQ集群会带来一系列有趣的问题。首要的问题就是我们该如何给节点命名，以便它们可以相互发现？下面是一些例子：
 
 * rabbit@hostname
 * rabbit@hostname.domainname
 * rabbit@172.17.0.4
 
-在你试图启动任何兔子之前，你应该确保容器间可以使用命名相互连通。例如，可以ping通@后面的内容。
+在你启动任何节点之前，你应该先确保容器之间可以通过这个名称相互连通。例如可以ping通@后面的内容。
 
-Erlang发布版（常被RabbitMQ使用）可以运行在两种命名模式里：短名称或长名称。最好是当它包含"."时采用长名称，否则是短名称。对于上面的命名示例，第一个是短名称，而第二个和第三个都是长名称。
+Erlang发布版（常被RabbitMQ使用）有两种命名模式：短名称或长名称。最佳实践是当它包含"."时采用长名称，否则采用短名称。对于上面的命名示例，第一个是短名称，而第二个和第三个都是长名称。
 
-看看我们在Kubernetes上是怎么命名nodes的：
+看看Kubernetes命名nodes时的选项：
 
-* 使用PetSet（现在也叫做StatlefulSets）让我们可以使用稳定的DNS命名。与常见的如果不健康就会被丢弃的“不可分解”副本相反，PetSet是一组有状态的pods，拥有强标记。
-* 使用IP地址和一些自动化对端发现（例如autocluster plugin），它可以以一种可发现的方法自动集群化RabbitMQ。
+* 我们可以使用[PetSet](http://kubernetes.io/docs/user-guide/petset/)（也叫做StatlefulSets）得到稳定的DNS名称。通常，副本一旦不健康就会被丢弃。与此相反，PetSet是一组有状态、拥有强标记的pods，
+* 使用IP地址和一些自动化的节点发现（例如[autocluster plugin](https://github.com/aweber/rabbitmq-autocluster/)，它可以以一种可发现的方法自动集群化RabbitMQ）。
 
-这些选项都需要运行在长名称模式下。但是运行前要注意：在Kubernetes Pod里配置的DNS/hostname与RabbitMQ 3.6.6之前的版本是不兼容的。
+这些选项都需要运行在长名称模式下。注意在Kubernetes Pod里配置的DNS/hostname与RabbitMQ 3.6.6之前的版本是不兼容的，有必要的话请在开始前先进行[修复](https://github.com/rabbitmq/rabbitmq-server/issues/890/)。
 
 ### Erlang cookie
-集群化成功的第二要素是RabbitMQ节点需要拥有共享的secret cookie。默认情况下，RabbitMQ从一个文件里读取这个cookie（如果没有这个文件则会生成）。为了保证在所有节点上这个Cookie的一致，我们采用的办法是：
+成功集群化的第二要素是RabbitMQ节点需要拥有共享的secret cookie。默认情况下，RabbitMQ从一个文件里读取这个cookie（如果没有这个文件则会生成）。为了保证所有节点上的这个Cookie一致，我们采用的办法是：
 
-* 在打Docker 镜像的时候就创建cookie文件。但不推荐这么做，因为拿到cookie就意味着获得了进入RabbitMQ内部的所有权限。
-* 在entrypoint脚本里创建文件。将secret作为环境变量，如果我们还需要entrypoint脚本，这是一个次好的办法。
-* 通过环境变量向Rabbit MQ传入更多的选项。比如：RABBITMQ_CTL_ERL_ARGS="-setcookie <our-cookie>"，RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="-setcookie <our-cookie>"  
+* #在Docker打镜像的时候就创建cookie文件。#但不推荐这么做，因为拿到cookie就意味着获得了进入RabbitMQ内部的所有权限。
+* #在entrypoint脚本里创建cookie文件，#将secret作为环境变量，如果我们还需要entrypoint脚本，这是一个次好的办法。
+
+---------- 校对分割线 ----------
+
+
+
+* #通过环境变量向Rabbit MQ传入更多的选项。#比如：RABBITMQ_CTL_ERL_ARGS="-setcookie <our-cookie>"，RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="-setcookie <our-cookie>"  
 
 ### 集群须知
 关于RabbitMQ集群我们还需要知道的一点是：当一个节点加入集群时，不管怎样它的数据都会丢失。通常这没什么关系，如果加入集群的空节点，那更是没什么好丢失的了。但是如果我们有两个独立运行了一段时间的节点，并且积累了一些数据，这种是没有办法在不丢失数据的情况下加入集群的（注意在网络划分或节点中断后集群恢复是一种特例，也会导致数据丢失）。对于特殊的负载，我们可以发明一些周边，例如即将要重置的节点手动或自动排空。但是没有一种健壮的解决办法，自动的或者全部的。
