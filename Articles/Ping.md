@@ -6,7 +6,9 @@
 
 结果1、2见下图
 
-![](1)
-![](2)
+![https://github.com/maxwell92/TechTips/blob/master/Articles/ping1.png](1)
+![https://github.com/maxwell92/TechTips/blob/master/Articles/ping2.png](2)
 
-前一天晚上睡觉前，连了VPN测了程序。然后合上笔记本睡觉，早上起来就发现出现了这个问题。但是不知道原因
+前一天晚上睡觉前，连了VPN测了程序。然后合上笔记本睡觉，早上起来就发现出现了这个问题。但是不知道原因。
+是测试程序的RESTful 接口，通过GET方法带了很多参数造成的？还是VPN没关占用了资源？
+
