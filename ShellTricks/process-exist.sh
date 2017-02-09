@@ -10,3 +10,4 @@ if yce_status; then
     sleep 5
 fi
 
+# 在Shell里，if 0 执行then，刚好跟C相反
