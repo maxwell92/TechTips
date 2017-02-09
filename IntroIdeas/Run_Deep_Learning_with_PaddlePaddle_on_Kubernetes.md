@@ -3,7 +3,7 @@
 
 编者注：本文由来自百度深度学习团队和CoreOS的Etcd团队共同编写
 
-![](baidu-research)
+![](https://github.com/maxwell92/TechTips/blob/master/IntroIdeas/pics/baidu-research.png)
 
 ### PaddlePaddle是什么
 
@@ -39,7 +39,7 @@ PaddlePaddle的设计思路是独立于计算基础设施的平台。用户可�
 
 PaddlePaddle支持分布式本地训练。在PaddlePaddle集群里有两种角色：Parameter Server和Trainer。每个paramenter server进程拥有全局模型的一个分片(shard)。每个trainer拥有该模型的本地拷贝，并且使用本地数据来更新这个模型。在训练过程中，trainers会把模型的更新发送至parameter server，然后由parameter server对这些更新进行聚合，由此实现trainers本地拷贝和全局模型的同步。
 
-![](paddle-model)
+![](https://github.com/maxwell92/TechTips/blob/master/IntroIdeas/pics/paddle-model.png)
 
 另外一些方法使用一组parameter server在多个节点上占用大量的CPU和内存来维持大型模型。但实践中，我们通常没有这么大的模型，因为鉴于GPU内存的限制，处理特大型模型是非常低效的。在我们的配置里，多个parameter server是主要是为了快速地通信。假定只有一个parameter server在处理所有的trainer，parameter server会聚合所有trainer的数据并到达瓶颈。在我们的实验里，一个实验性的有效配置包含了相同数量的trainer和parameter server。并且我们通常在同一个节点上运行一对trainer和parameter server。按照下列的Kubernetes任务配置，我们启动了N个Pods的任务，每个Pod里都有一个parameter server和trainer进程。
 
@@ -79,7 +79,7 @@ spec:
 
 我们可以看到配置里parallelism和completions都设置为3。那么这个任务将会同时启动3个PaddlePaddle Pods，这个任务随着这3个Pods结束而结束。
 
-![](paddle-job)
+![](https://github.com/maxwell92/TechTips/blob/master/IntroIdeas/pics/job_paddle.png)
 
 每个Pod的入口(entrypoint)是[start.sh](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/howto/usage/k8s/src/k8s_train/start.sh)。它会从存储服务上下载数据，所以trainer可以快速地从Pod本地磁盘空间读到数据。当下载完成后，它运行一个Python脚本，[start_paddle.py](https://github.com/PaddlePaddle/Paddle/blob/develop/doc/howto/usage/k8s/src/k8s_train/start_paddle.py)，这会启动parameter server，直到所有Pod的parameter server都可以进行服务时，再启动每个Pod里的trainer进程。
 
