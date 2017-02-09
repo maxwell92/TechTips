@@ -25,4 +25,7 @@
 
 20170209
     
-    [ ] 多数据中心逻辑检查
+    [x] 多数据中心逻辑检查：健康检查livenessprobe controller编写
+    [x] 多数据中心逻辑检查：模板排序
+    [x] 多数据中心逻辑检查：更新节点详情controller
+    [x] 多数据中心逻辑检查：为deployment/service controller添加defaultSort()方法
