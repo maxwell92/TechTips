@@ -29,3 +29,8 @@
     [x] 多数据中心逻辑检查：模板排序
     [x] 多数据中心逻辑检查：更新节点详情controller
     [x] 多数据中心逻辑检查：为deployment/service controller添加defaultSort()方法
+
+20170210
+
+    [x] 用户权限更新文档
+    [x] 用户权限更新navList
