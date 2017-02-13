@@ -34,3 +34,8 @@
 
     [x] 用户权限更新文档
     [x] 用户权限更新navList及代码
+
+20170213
+
+    [x] 用户权限user初始化user/init, user列表/user的controller 及 doc  
+    [x] 更新权限的设计
