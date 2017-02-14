@@ -39,3 +39,9 @@
 
     [x] 用户权限user初始化user/init, user列表/user的controller 及 doc  
     [x] 更新权限的设计
+
+20170214
+
+    [ ] 新的权限设计文档和代码
+    [ ] 跟马睿安排golang
+    
