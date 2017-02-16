@@ -49,3 +49,9 @@
     
     [x] 服务列表bug排查，修复了pointer问题，更新了对多数据中心的支持 
     [x] 应用列表同样的pointer问题修复
+
+20170216
+
+    [x] 多数据中心小bug修复，联调
+    [ ] ReleaseNote编写
+    [ ] master更新
