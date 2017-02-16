@@ -35,7 +35,7 @@ FaaS拥有下面的特点：
 
 4. 函数启动延时受很多因素的干扰。以AWS Lambda为例，如果采用了JS或Python实现了函数，它的启动时间一般不会超过10~100毫秒。但如果是实现在JVM上的函数，当遇到突发的大流量或者调用间隔过长的情况，启动时间会显著变长。
 
-5. 基于API Gateway可以将请求的路由和对应的处理函数进行映射，并将响应结果返回给调用方。API Gateway还会扮演认证、输入校验等的角色。
+5. 借助于API Gateway可以将请求的路由和对应的处理函数进行映射，并将响应结果返回给调用方。API Gateway还会扮演认证、输入校验等的角色。
 
 
 比如对于一个Web应用，在这里后端系统实现了大部分业务逻辑：认证、搜索、事务等，它的架构如下：
@@ -54,17 +54,35 @@ FaaS拥有下面的特点：
 * 环保计算。即使在云的环境上，仍习惯于购买多余的服务器，最终倒置空闲。Serverless杜绝了这种情况。
 
 
-
 ### Kubernetes 与 FaaS
 
-在Martin Flower的专栏里有这样的描述：
+Fission是一款基于Kubernetes的FaaS框架。通过Fission可以轻而易举地将函数发布成HTTP服务。它在源码级工作，并抽象出容器镜像。同时它还帮助减轻了Kubernetes的学习前，无需了解太多K8s也可以搭建出实用的服务。Fission目前支持NodeJS和Python，并且可以与HTTP路由、Kubernetes Events和其他的事件触发器结合。这些函数只有在运行的时候才会消耗CPU和内存。
 
-* Serverless architectures refer to applications that significantly depend on third-party services(AKA Backend as a Service or "BaaS") or on custom code that is run ephmemeral containers (Function as a Service or "FaaS") *
+Kubernetes提供了强大的弹性编排系统，拥有易于理解的后端API和不断发展壮大的社区。Fission将容器编排功能交给了K8s，专注于FaaS特性。
 
-前面也提到了FaaS的每个功能都拥有很短的生命周期，容器作为任务运行的基本单位，非常适合FaaS的场景。
+对于FaaS来说，它最重要的两个特性是将函数转换为服务，同时管理服务的生命周期。有很多办法可以实现这两个特性，但需要考虑一些问题，比如“框架运行在源码级？还是Docker镜像？”，“第一次运行的负载多少能接受”，不同的选择会影响到平台的扩展性、易用性、资源使用以及性能等问题。
+
+为了使Fission足够易用，它运行在源码级。用户不再参与镜像构建、推仓库、镜像认证、镜像版本等过程。但源码级的接口不允许用户打包二进制依赖。Fission采用的方式是在镜像内部放置动态的函数加载工具。这让用户可以在源码层操作，同时在需要的时候可以定制镜像。这些镜像在Fission里叫做“环境镜像”。包含了特定语言的运行时，一组常用的依赖和函数的动态加载工具。如果这些依赖已经足够，就直接使用这个镜像，不够的话需要重新导入依赖并构建镜像。
+
+环境镜像是Fission中唯一与语言相关的部分。可以把它看做是框架里其余部门的统一接口。所以Fission可以更加容器扩展，就像VFS一样。
+
+FaaS的一个目标是在运行的时候消费资源。这只是优化了函数运行时的资源使用，而冷启动的时候可能会有些资源使用过载。比如对于用户登录的过程，多等几秒都是不可接受的。
+
+为了改变这个问题，Fission在任何环境里都维持了一个容器池。当有函数进来时，Fission无需启动新容器，直接从池里取一个，将函数拷贝到容器里，动态加载，并将请求路由到对应的实例。
+
+![](fission-on-k8s)
 
 
-### 在k8s上运行Fission, a voting demo
+
+
+
+
+
+
+通过`kubectl create`命令可以安装Fission。
+
+
+
 
 ### xx
 
@@ -74,11 +92,11 @@ FaaS可能是未来的一种走势，但一定不会是最终的未来。总有�
 
 
 [Function as a Service](https://en.wikipedia.org/wiki/Function_as_a_Service)
+[Thinking Serverless](http://highscalability.com/blog/2017/1/30/part-1-of-thinking-serverlesshow-new-approaches-address-mode.html)
 [Serverless Architecture](https://martinfowler.com/articles/serverless.html#unpacking-faas)
 [Fission: Serverless Functions as a Service for Kubernetes](http://blog.kubernetes.io/2017/01/fission-serverless-functions-as-service-for-kubernetes.html)
 [Fission Official Site](http://fission.io/)
 [Fission Github](https://github.com/fission/fission)
-[Thinking Serverless](http://highscalability.com/blog/2017/1/30/part-1-of-thinking-serverlesshow-new-approaches-address-mode.html)
 
 
 
@@ -106,3 +124,11 @@ FaaS的优点：
 
 
 Serverless改变了下游软件部署和维护的理念，提高了软件开发人员的效率，但它没有减少软件生命周期中的环节。
+### 在k8s上运行Fission, a voting demo
+
+在Martin Flower的专栏里有这样的描述：
+
+* Serverless architectures refer to applications that significantly depend on third-party services(AKA Backend as a Service or "BaaS") or on custom code that is run ephmemeral containers (Function as a Service or "FaaS") *
+
+前面也提到了FaaS的每个功能都拥有很短的生命周期，容器作为任务运行的基本单位，非常适合FaaS的场景。
+
