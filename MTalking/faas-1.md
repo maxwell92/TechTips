@@ -72,6 +72,30 @@ FaaS的一个目标是在运行的时候消费资源。这只是优化了函数�
 
 ![](fission-on-k8s)
 
+Fission设计为一组微服务: 
+
+* Controller: 记录了函数、HTTP路由、事件触发器和环境镜像
+* Pool Manager: 管理环境容器，加载函数到容器，函数实例空闲时杀掉
+* Router: 接受HTTP请求，并路由到对应的函数实例，必要的话从Pool Manager中请求容器实例
+
+Controller支持Fission的API，其他的组件监视controller的更新。Router暴露为K8s里的LoadBalancer或NodePort类型的服务，这依赖于K8s集群放在哪里。
+
+当Router收到请求，先去缓存Cache里查看该是否请求一个已经存在的服务。如果没有，然后访问请求映射的服务函数，并向Pool Manager申请一个容器实例。Pool Manager拥有一个空闲Pod池。它选择一个Pod，并把函数加载到里面（通过向容器里的Sidecar发送请求实现），并且把Pod的地址返回给router。router会把请求转发到该Pod。Pod会被缓存起来以应对后续的请求。如果空闲了几分钟，它就会被杀死。
+
+目前，Fission将一个函数映射为一个容器，对于自动扩展为多个实例的特性在后续版本里。以及重用函数Pods来支持多个函数也在计划中，在这种情况下隔离不是必须的。
+
+对于较小的REST API来说，Fission是个很好的选择，通过实现webhooks，可以为Slack或其他服务编写chatbots
+
+在Github上提供了一个通讯录例子，可以使用函数来想通讯录读取和添加记录。通过Redis来保持状态。该应用有两个端点，一个GET是从Redis里读出通讯录，并渲染为HTML。POST是向通讯录里添加新的记录。这就是全部了，没有Dockerfile，更新appp
+
+
+Bots、Webhooks、REST APIs
+
+Handling Kubernetes Events
+
+Status 
+
+
 
 
 
