@@ -53,12 +53,12 @@
 20170216
 
     [x] 多数据中心小bug修复，联调
-    [ ] ReleaseNote编写
-    [ ] master更新
+    [x] ReleaseNote编写
+    [x] master更新
 
 20170217
 
-    [ ] 前后联调
+    [x] 前后联调
     [ ] ReleaseNote编写
-    [ ] master更新
+    [x] master更新，QA，生产
 
