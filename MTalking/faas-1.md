@@ -9,7 +9,7 @@ Serverless的概念刚刚出现在HackerNews时并不为大众所接受。后来
 
 微服务架构近年来是一个非常火爆的话题，大大小小的公司都开始逐步分拆原来的单体应用，试着转换到由各个模块服务组合成大型的复杂应用。Serverless可以看作是比微服务架构更细粒度的架构模式，即FaaS。Lambda也是FaaS的典型代表，它允许用户仅仅上传代码而无需提供和管理服务器，由它负责代码的执行、高可用扩展，支持从别的AWS服务或其他Web应用直接调用等。以电子商务应用为例，微服务中可以将浏览商品、添加购物车、下单、支付、查看物流等拆分为解耦的微服务。在FaaS里，它可以拆分到用户的所有CRUD操作代码。当发生“下单”事件时，将触发相应的Functions，交由Lambda执行。人们在越来越多的场景里将Serverless和FaaS等同起来。
 
-![](speeding-up-the-platforms)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/speed-up-the-platform.jpg)
 
 假设有下面的JavaScript代码：
 
@@ -39,11 +39,11 @@ FaaS拥有下面的特点：
 
 
 比如对于一个Web应用，在这里后端系统实现了大部分业务逻辑：认证、搜索、事务等，它的架构如下：
-![](3-tiers-web-application)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/3-tiers-web-application.png)
 
 如果采用Serverless架构，将认证、数据库等采用第三方的服务，从原来的单体后端里分拆出来，需要的话在原来的客户端里加入了一些业务逻辑。对于计算敏感型的搜索功能，也不再使用一直在线的服务器进行支持，如此一来它看起来就清晰多了：
 
-![](web-serverless)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/web-serverless.png)
 
 这么拆分之后很好地实现了Clean Code里单一职责原则(Single Responsibility Principle, SRP)。不仅如此，FaaS带来的好处还有：
 
@@ -70,7 +70,7 @@ FaaS的一个目标是在运行的时候消费资源。这只是优化了函数�
 
 为了改变这个问题，Fission在任何环境里都维持了一个容器池。当有函数进来时，Fission无需启动新容器，直接从池里取一个，将函数拷贝到容器里，动态加载，并将请求路由到对应的实例。
 
-![](fission-on-k8s)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-on-k8s.png)
 
 Fission设计为一组微服务: 
 
