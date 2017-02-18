@@ -88,12 +88,17 @@ Controller支持Fission的API，其他的组件监视controller的更新。Route
 
 在Github上提供了一个通讯录例子，可以使用函数来想通讯录读取和添加记录。通过Redis来保持状态。该应用有两个端点，一个GET是从Redis里读出通讯录，并渲染为HTML。POST是向通讯录里添加新的记录。这就是全部了，没有Dockerfile，更新appp
 
+Fission同时还支持根据Kubernetes的Watch机制来出发函数的执行。例如你可以设置一个函数来watch某个命名空间下所有满足某个标签的pod，这个函数将得到序列化的对象和这个上下文的Watch Event类型(added/removed/updated)。这些事件处理函数可以用于简单的监控，例如你可以设置当任意一个服务添加到集群时向Slack发送一条消息。也有更复杂的应用，例如编写一个watching Kubernetes第三方资源(Third Party Resource)的自定义controller。
 
-Bots、Webhooks、REST APIs
+在2017年1月份，Fission还处于alpha版，我们正在努力让Kubernetes上的FaaS更加方便，易于使用和轻松集成。在未来几个月我们将添加单元测试、与Git集成、函数监控和日志聚合。我们也会跟其他的Events进行集成。对了，还有为更多的语言创建环境，现在支持NodeJS和Python， 初步支持C# .NET
 
-Handling Kubernetes Events
+你可以在Github上找到roadmap
 
-Status 
+参与进来
+Fission是一个开源项目，由Platform 9进行开发。在Github上关注，加入Slack，或者粉Twitter
+
+### Fission 使用
+
 
 
 
