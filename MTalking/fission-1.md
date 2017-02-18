@@ -65,6 +65,8 @@ Fission是一款基于Kubernetes的FaaS框架。通过Fission可以轻而易举�
 
 Kubernetes提供了强大的弹性编排系统，拥有易于理解的后端API和不断发展壮大的社区。Fission将容器编排功能交给了K8s，专注于FaaS特性。
 
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-rest-api.png)
+
 对于FaaS来说，它最重要的两个特性是将函数转换为服务，同时管理服务的生命周期。有很多办法可以实现这两个特性，但需要考虑一些问题，比如“框架运行在源码级？还是Docker镜像？”，“第一次运行的负载多少能接受”，不同的选择会影响到平台的扩展性、易用性、资源使用以及性能等问题。
 
 为了使Fission足够易用，它运行在源码级。用户不再参与镜像构建、推仓库、镜像认证、镜像版本等过程。但源码级的接口不允许用户打包二进制依赖。Fission采用的方式是在镜像内部放置动态的函数加载工具。这让用户可以在源码层操作，同时在需要的时候可以定制镜像。这些镜像在Fission里叫做“环境镜像”。包含了特定语言的运行时，一组常用的依赖和函数的动态加载工具。如果这些依赖已经足够，就直接使用这个镜像，不够的话需要重新导入依赖并构建镜像。
@@ -125,20 +127,20 @@ $ fission env create --name nodejs --image fission/node-env
 
 1. fission env create --name nodejs --image fission/node-env
 
-![](fission-env) 
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-env.png) 
 
 由fission主程序执行命令env和子命令create，通过--name指定语言为NodeJS，通过--image指定镜像为fission/node-env，通过HTTP的POST /v1/environments请求向controller发送环境信息JSON。controller拿到这个JSON先获取一个UUID进行标记，然后将放到ETCD里。由此完成了环境资源的存储。
 
 
 2. fission function create --name hello --env nodejs --code hello.js
 
-![](fission-function)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-function.png)
 
 同样，由fission主程序执行命令functino和子命令create，通过--name参数指定函数名为hello，--env参数确定环境，--code参数确定要执行的函数代码。通过POST向/v1/functions发出请求，携带函数信息的JSON。controller拿到JSON后进行函数资源的存储。首先将代码写到文件里，写之前会拿到UUID。然后写到文件名为该UUID的文件里。急着向ETCD的API发送HTTP请求，在file/name路径下有序存放UUID。最后同env，将UUID和序列化后的JSON数据写到etcd里。
 
 3. fission route create --method GET --url /hello --function hello
 
-![](fission-route)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-http.png)
 
 通过参数--method指定请求所需方法为GET，--url指定API路由为hello，--function指定对应执行的函数为hello。通过POST请求向/v1/triggers/http发出请求，将路由和函数的映射关系信息发送到controller。controller会在已有的trigger列表里进行重名检查，如果不重复，才会获取UUID并将序列化后的JSON数据写到etcd里。
 
@@ -152,7 +154,7 @@ router使用Cache维护着一份function到service的映射，同时还有trigge
 
 Poolmgr创建新的service时，需要根据env创建Pod pool(初始大小为3个副本的deployment),然后从中随机选择一个Ready的Pod。再为此建立对应的Service。
 
-![](fission-all)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-fission-all.png)
 在2017年1月份，Fission还处于alpha版，我们正在努力让Kubernetes上的FaaS更加方便，易于使用和轻松集成。在未来几个月我们将添加单元测试、与Git集成、函数监控和日志聚合。我们也会跟其他的Events进行集成。对了，还有为更多的语言创建环境，现在支持NodeJS和Python， 初步支持C# .NET
 
 你可以在Github上找到roadmap
