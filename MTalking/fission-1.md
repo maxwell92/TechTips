@@ -118,19 +118,19 @@ $ fission env create --name nodejs --image fission/node-env
 
 通过阅读Fission的源码，可以很清晰地看到它的执行过程：
 
-*`fission env create --name nodejs --image fission/node-env`*
+*`1. fission env create --name nodejs --image fission/node-env`*
 
 ![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-env.png) 
 
 由fission主程序执行命令env和子命令create，通过--name指定语言为NodeJS，通过--image指定镜像为fission/node-env，通过HTTP的POST方法请求controller的/v1/environments并发送环境信息JSON。controller拿到这个JSON后先获取一个UUID进行标记，然后将放到ETCD里。由此完成了环境资源的存储。
 
-*`fission function create --name hello --env nodejs --code hello.js`*
+*`2. fission function create --name hello --env nodejs --code hello.js`*
 
 ![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-function.png)
 
 同样，由fission主程序执行命令function和子命令create，通过--name参数指定函数名为hello，--env参数确定环境，--code参数确定要执行的函数代码。通过POST向/v1/functions发出请求，携带函数信息的JSON。controller拿到JSON后进行函数资源的存储。首先将拿到UUID，然后写到文件名为该UUID的文件里。接着向ETCD的API发送HTTP请求，在file/name路径下有序存放UUID。最后类似上面env命令，将UUID和序列化后的JSON数据写到ETCD里。
 
-*`fission route create --method GET --url /hello --function hello`*
+*`3. fission route create --method GET --url /hello --function hello`*
 
 ![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-http-seq.png)
 
@@ -140,7 +140,7 @@ fission通过参数--method指定请求所需方法为GET，--url指定API路由
 
 router使用Cache维护着一份function到service的映射，同时还有trigger集合(有个goroutine通过controller保持对这个trigger集合的更新），在启动时按照添加trigger里的url和针对对应函数的handler初始化路由。
 
-*`curl http://$FISSION_ROUTER/hello`*
+*`4. curl http://$FISSION_ROUTER/hello`*
 
 当执行该curl时，请求发送至router容器。收到请求后会转发到两个对应的handler。一个是用户定义的面向外部的，一个是内部的。实际上它们执行的是同一个handler。任何handler都会先根据funtion名去Cache里查找对应的service名。如果没有命中，将通过poolmgr为函数创建新的Service，并把记录添加到Cache。然后生成一个反向代理，接收外部请求，然后转发至Kubernetes Service。
 
@@ -157,10 +157,15 @@ Fission是一个开源项目，由Platform 9和社区进行开发。社区正在
 ### 参考
 
 [Function as a Service](https://en.wikipedia.org/wiki/Function_as_a_Service)
+
 [Thinking Serverless](http://highscalability.com/blog/2017/1/30/part-1-of-thinking-serverlesshow-new-approaches-address-mode.html)
+
 [Serverless Architecture](https://martinfowler.com/articles/serverless.html#unpacking-faas)
+
 [Fission: Serverless Functions as a Service for Kubernetes](http://blog.kubernetes.io/2017/01/fission-serverless-functions-as-service-for-kubernetes.html)
+
 [Fission Official Site](http://fission.io/)
+
 [Fission Github](https://github.com/fission/fission)
 
 
