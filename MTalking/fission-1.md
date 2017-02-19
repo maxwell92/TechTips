@@ -109,7 +109,7 @@ $ curl http://$FISSION_ROUTER/hello
 Hello, world! 
 ```
 
-如果是第一次运行，还需要准备NodeJS的运行环境：
+如果是第一次运行，需要先准备NodeJS的运行环境：
 
 ```shell
 # Add the stock NodeJS env to your Fission deployment
@@ -128,7 +128,7 @@ $ fission env create --name nodejs --image fission/node-env
 
 ![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-function.png)
 
-同样，由fission主程序执行命令function和子命令create，通过--name参数指定函数名为hello，--env参数确定环境，--code参数确定要执行的函数代码。通过POST向/v1/functions发出请求，携带函数信息的JSON。controller拿到JSON后进行函数资源的存储。首先将拿到UUID，然后写到文件名为该UUID的文件里。接着向ETCD的API发送HTTP请求，在file/name路径下有序存放UUID。最后类似上面env命令，将UUID和序列化后的JSON数据写到etcd里。
+同样，由fission主程序执行命令function和子命令create，通过--name参数指定函数名为hello，--env参数确定环境，--code参数确定要执行的函数代码。通过POST向/v1/functions发出请求，携带函数信息的JSON。controller拿到JSON后进行函数资源的存储。首先将拿到UUID，然后写到文件名为该UUID的文件里。接着向ETCD的API发送HTTP请求，在file/name路径下有序存放UUID。最后类似上面env命令，将UUID和序列化后的JSON数据写到ETCD里。
 
 * fission route create --method GET --url /hello --function hello *
 
@@ -136,22 +136,19 @@ $ fission env create --name nodejs --image fission/node-env
 
 fission通过参数--method指定请求所需方法为GET，--url指定API路由为hello，--function指定对应执行的函数为hello。通过POST向/v1/triggers/http发出请求，将路由和函数的映射关系信息发送到controller。controller会在已有的trigger列表里进行重名检查，如果不重复，才会获取UUID并将序列化后的JSON数据写到etcd里。
 
-前面的都是由本地的fission程序完成的。我们已经预先创建了fission-bundle的deployment和service。它创建了名为fission的命名空间，并在里面启动4个Deployment，分别是controller, router, poolMgr, etcd，并创建NodePort类型的服务controller和router，分别监听端口31313和31314。同时创建另一个名为fission-function的命名空间用来运行执行函数的Pod.
+前面的都是由本地的fission程序完成的。我们已经预先创建了fission-bundle的Deployment和Service。它创建了名为fission的命名空间，并在里面启动4个Deployment，分别是controller, router, poolMgr, etcd，并创建NodePort类型的Service: controller和router，分别监听端口31313和31314。同时创建另一个名为fission-function的命名空间用来运行执行函数的Pod.
 
-router使用Cache维护着一份function到service的映射，同时还有trigger集合(有个goroutine通过controller保持对这个trigger集合的更新），在启动时初始化时按照添加trigger里的url和针对对应函数的handler的路由。
+router使用Cache维护着一份function到service的映射，同时还有trigger集合(有个goroutine通过controller保持对这个trigger集合的更新），在启动时按照添加trigger里的url和针对对应函数的handler初始化路由。
 
 * curl http://$FISSION_ROUTER/hello *
 
-当执行该语句时，请求发送至router容器。收到请求后会转发到两个对应的handler。一个是用户定义的面向外部的，一个是内部的。实际上它们执行的是同一个handler。不管是什么handler都会先根据函数名去Cache里查找对应的service名。如果没有命中，将通过poolmgr为函数创建新的Service，并把记录添加到Cache。最后生成一个反向代理，接收外部请求，然后转发至Kubernetes Service。
+当执行该curl时，请求发送至router容器。收到请求后会转发到两个对应的handler。一个是用户定义的面向外部的，一个是内部的。实际上它们执行的是同一个handler。任何handler都会先根据funtion名去Cache里查找对应的service名。如果没有命中，将通过poolmgr为函数创建新的Service，并把记录添加到Cache。然后生成一个反向代理，接收外部请求，然后转发至Kubernetes Service。
 
-Poolmgr创建新的service时，需要根据env创建Pod pool(初始大小为3个副本的deployment),然后从中随机选择一个Ready的Pod。再为此建立对应的Service。
+Poolmgr在创建新的service时，会根据env创建Pod pool(初始大小为3个副本的deployment)，然后从中随机选择一个Ready的Pod。接着为此建立对应的Service。
 
 ![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-fission-all.png)
-在2017年1月份，Fission还处于alpha版，我们正在努力让Kubernetes上的FaaS更加方便，易于使用和轻松集成。在未来几个月我们将添加单元测试、与Git集成、函数监控和日志聚合。我们也会跟其他的Events进行集成。对了，还有为更多的语言创建环境，现在支持NodeJS和Python， 初步支持C# .NET
 
-你可以在Github上找到roadmap
-
-参与进来Fission是一个开源项目，由Platform 9进行开发。在Github上关注，加入Slack，或者粉Twitter
+Fission是一个开源项目，由Platform 9和社区进行开发。社区正在努力让Kubernetes上的FaaS更加易用和轻松集成。在未来几个月将添加单元测试、与Git集成、函数监控和日志聚合等特性，同时也会跟其他的Events进行集成，对了，还有为更多的语言创建环境。在今年1月份，Fission发布了alpha版。
 
 ### 后记 
 
