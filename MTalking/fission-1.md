@@ -22,7 +22,7 @@ module.exports = function(context, callback) { callback(200, "Hello, world!
 
 ```shell
 $ curl -XGET localhost:8080 
-Hello, World
+Hello, World!
 ```
 
 FaaS拥有下面的特点：
