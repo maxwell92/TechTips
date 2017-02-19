@@ -70,7 +70,7 @@ Kubernetes提供了强大的弹性编排系统，并且拥有易于理解的后�
 
 为了使Fission足够易用，它选择在源码级工作。用户不再参与镜像构建、推仓库、镜像认证、镜像版本等过程。但源码级的接口不允许用户打包二进制依赖。Fission采用的方式是在镜像内部放置动态的函数加载工具，让用户可以在源码层操作，同时在需要的时候可以定制镜像。这些镜像在Fission里叫做“环境镜像”，它包含了特定语言的运行时、一组常用的依赖和函数的动态加载工具。如果这些依赖已经足够满足需求，就直接使用这个镜像，否则的话需要重新导入依赖并构建镜像。环境镜像是Fission中唯一与语言相关的部分。可以把它看做是框架里其余部分的统一接口。所以Fission可以更加容易扩展(这看起来就像VFS一样)。
 
-FaaS优化了函数运行时的资源使用，它的目标是在运行的时候才消费资源。但在冷启动的时候可能会有些资源使用过载，比如对于用户登录的过程，无论多等几秒都是不可接受的。为了改变这个问题，Fission维持了一个面向任何环境容器池。当有函数进来时，Fission无需启动新容器，直接从池里取一个，将函数拷贝到容器里，动态加载，并将请求路由到对应的实例。
+FaaS优化了函数运行时的资源使用，它的目标是在运行的时候才消费资源。但在冷启动的时候可能会有些资源使用过载，比如对于用户登录的过程，无论多等几秒都是不可接受的。为了改变这个问题，Fission维持了一个面向任何环境容器池。当有函数进来时，Fission无需启动新容器，直接从池里取一个，将函数拷贝到容器里，执行动态加载，并将请求路由到对应的实例。
 
 ![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-on-k8s.png)
 
@@ -79,21 +79,18 @@ FaaS优化了函数运行时的资源使用，它的目标是在运行的时候�
 * Controller: 记录了函数、HTTP路由、事件触发器和环境镜像
 * Pool Manager: 管理环境容器，加载函数到容器，函数实例空闲时杀掉
 * Router: 接受HTTP请求，并路由到对应的函数实例，必要的话从Pool Manager中请求容器实例
-* Etcd: 
 
-Controller支持Fission的API，其他的组件监视controller的更新。Router暴露为K8s里的LoadBalancer或NodePort类型的服务，这依赖于K8s集群放在哪里。
+在Kubernetes上，这些组件都以Deployment的方式运行，并对外暴露Service。除了这三个Fission特有的组件外，还用了Etcd作为资源和映射的存储，同样也以Deployment的方式启动。Controller支持Fission的API，其他的组件监视controller的更新。Router暴露为K8s里的LoadBalancer或NodePort类型的服务(这取决于K8s集群放在哪里)。
 
-当Router收到请求，先去缓存Cache里查看该是否请求一个已经存在的服务。如果没有，然后访问请求映射的服务函数，并向Pool Manager申请一个容器实例。Pool Manager拥有一个空闲Pod池。它选择一个Pod，并把函数加载到里面（通过向容器里的Sidecar发送请求实现），并且把Pod的地址返回给router。router会把请求转发到该Pod。Pod会被缓存起来以应对后续的请求。如果空闲了几分钟，它就会被杀死。
+目前，Fission将一个函数映射为一个容器，对于自动扩展为多个实例的特性在后续版本里。以及重用函数Pods来支持多个函数也在计划中(在这种情况下隔离不是必须的)。Fission文档简单介绍了它的工作原理：
 
-目前，Fission将一个函数映射为一个容器，对于自动扩展为多个实例的特性在后续版本里。以及重用函数Pods来支持多个函数也在计划中，在这种情况下隔离不是必须的。
+* 当Router收到外部请求，它先去缓存Cache里查看是否在请求一个已经存在的服务。如果没有，要访问请求映射的服务函数，需要向Pool Manager申请一个容器实例执行函数。Pool Manager拥有一个空闲Pod池。它选择一个Pod，并把函数加载到里面（通过向容器里的Sidecar发送请求实现），并且把Pod的地址返回给Router。Router将外部请求代理转发到该Pod，并将响应结果返回。Pod会被缓存起来以应对后续的请求。如果空闲了几分钟，它就会被杀死。*
 
-对于较小的REST API来说，Fission是个很好的选择，通过实现webhooks，可以为Slack或其他服务编写chatbots
+对于较小的REST API来说，Fission是个很好的选择，通过实现webhooks，可以为Slack或其他服务编写chatbots。
 
-在Github上提供了一个通讯录例子，可以使用函数来想通讯录读取和添加记录。通过Redis来保持状态。该应用有两个端点，一个GET是从Redis里读出通讯录，并渲染为HTML。POST是向通讯录里添加新的记录。这就是全部了，没有Dockerfile，更新appp
+Fission同时还支持根据Kubernetes的Watch机制来出发函数的执行。例如你可以设置一个函数来watch某个命名空间下所有满足某个标签的pod，这个函数将得到序列化的对象和这个上下文的Watch Event类型(added/removed/updated)。又如通过设置事件处理函数可以将它应用于简单的监控，指定当任意一个服务添加到集群时向Slack发送一条消息。当然也有更复杂的应用，例如编写一个watching Kubernetes第三方资源(Third Party Resource)的自定义controller。
 
-Fission同时还支持根据Kubernetes的Watch机制来出发函数的执行。例如你可以设置一个函数来watch某个命名空间下所有满足某个标签的pod，这个函数将得到序列化的对象和这个上下文的Watch Event类型(added/removed/updated)。这些事件处理函数可以用于简单的监控，例如你可以设置当任意一个服务添加到集群时向Slack发送一条消息。也有更复杂的应用，例如编写一个watching Kubernetes第三方资源(Third Party Resource)的自定义controller。
-
-在Fission的官网上有个入门的例子：
+在Fission的官网上有个入门的使用示例：
 
 ```shell
 $ cat hello.js
@@ -119,32 +116,31 @@ Hello, world!
 $ fission env create --name nodejs --image fission/node-env
 ```
 
-阅读Fission的源码， 可以很清晰地看到它的执行过程：
+通过阅读Fission的源码，可以很清晰地看到它的执行过程：
 
-1. fission env create --name nodejs --image fission/node-env
+* fission env create --name nodejs --image fission/node-env *
 
 ![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-env.png) 
 
-由fission主程序执行命令env和子命令create，通过--name指定语言为NodeJS，通过--image指定镜像为fission/node-env，通过HTTP的POST /v1/environments请求向controller发送环境信息JSON。controller拿到这个JSON先获取一个UUID进行标记，然后将放到ETCD里。由此完成了环境资源的存储。
+由fission主程序执行命令env和子命令create，通过--name指定语言为NodeJS，通过--image指定镜像为fission/node-env，通过HTTP的POST方法请求controller的/v1/environments并发送环境信息JSON。controller拿到这个JSON后先获取一个UUID进行标记，然后将放到ETCD里。由此完成了环境资源的存储。
 
-
-2. fission function create --name hello --env nodejs --code hello.js
+* fission function create --name hello --env nodejs --code hello.js *
 
 ![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-function.png)
 
-同样，由fission主程序执行命令functino和子命令create，通过--name参数指定函数名为hello，--env参数确定环境，--code参数确定要执行的函数代码。通过POST向/v1/functions发出请求，携带函数信息的JSON。controller拿到JSON后进行函数资源的存储。首先将代码写到文件里，写之前会拿到UUID。然后写到文件名为该UUID的文件里。急着向ETCD的API发送HTTP请求，在file/name路径下有序存放UUID。最后同env，将UUID和序列化后的JSON数据写到etcd里。
+同样，由fission主程序执行命令function和子命令create，通过--name参数指定函数名为hello，--env参数确定环境，--code参数确定要执行的函数代码。通过POST向/v1/functions发出请求，携带函数信息的JSON。controller拿到JSON后进行函数资源的存储。首先将拿到UUID，然后写到文件名为该UUID的文件里。接着向ETCD的API发送HTTP请求，在file/name路径下有序存放UUID。最后类似上面env命令，将UUID和序列化后的JSON数据写到etcd里。
 
-3. fission route create --method GET --url /hello --function hello
+* fission route create --method GET --url /hello --function hello *
 
 ![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-http-seq.png)
 
-通过参数--method指定请求所需方法为GET，--url指定API路由为hello，--function指定对应执行的函数为hello。通过POST请求向/v1/triggers/http发出请求，将路由和函数的映射关系信息发送到controller。controller会在已有的trigger列表里进行重名检查，如果不重复，才会获取UUID并将序列化后的JSON数据写到etcd里。
+fission通过参数--method指定请求所需方法为GET，--url指定API路由为hello，--function指定对应执行的函数为hello。通过POST向/v1/triggers/http发出请求，将路由和函数的映射关系信息发送到controller。controller会在已有的trigger列表里进行重名检查，如果不重复，才会获取UUID并将序列化后的JSON数据写到etcd里。
 
-前面的都是由本地的fission程序完成的。我们已经预先创建了fission的deployment和service。它启动了fission-bundle。它创建了名为fission的命名空间，并在里面启动4个Deployment，分别是controller, router, poolMgr, etcd，并创建NodePort类型的服务controller和router，分别监听端口31313和31314。同时创建另一个名为fission-function的命名空间用来运行执行函数的Pod.
+前面的都是由本地的fission程序完成的。我们已经预先创建了fission-bundle的deployment和service。它创建了名为fission的命名空间，并在里面启动4个Deployment，分别是controller, router, poolMgr, etcd，并创建NodePort类型的服务controller和router，分别监听端口31313和31314。同时创建另一个名为fission-function的命名空间用来运行执行函数的Pod.
 
-router使用Cache维护着一份function到service的映射，同时还有trigger集合(有个goroutine通过controller保持对这个trigger集合的更新），在启动时初始化路由按照路由添加trigger里的url和针对对应函数的handler。
+router使用Cache维护着一份function到service的映射，同时还有trigger集合(有个goroutine通过controller保持对这个trigger集合的更新），在启动时初始化时按照添加trigger里的url和针对对应函数的handler的路由。
 
-4. curl http://$FISSION_ROUTER/hello
+* curl http://$FISSION_ROUTER/hello *
 
 当执行该语句时，请求发送至router容器。收到请求后会转发到两个对应的handler。一个是用户定义的面向外部的，一个是内部的。实际上它们执行的是同一个handler。不管是什么handler都会先根据函数名去Cache里查找对应的service名。如果没有命中，将通过poolmgr为函数创建新的Service，并把记录添加到Cache。最后生成一个反向代理，接收外部请求，然后转发至Kubernetes Service。
 
