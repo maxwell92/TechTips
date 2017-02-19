@@ -43,7 +43,7 @@ FaaS拥有下面的特点：
 
 如果采用Serverless架构，将认证、数据库等采用第三方的服务，从原来的单体后端里分拆出来，需要的话在原来的客户端里加入了一些业务逻辑。对于计算敏感型的搜索功能，也不再使用一直在线的服务器进行支持，如此一来它看起来就清晰多了：
 
-![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/web-serverless.png)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/serverless-app.png)
 
 这么拆分之后很好地实现了Clean Code里单一职责原则(Single Responsibility Principle, SRP)。不仅如此，FaaS带来的好处还有：
 
@@ -140,7 +140,7 @@ $ fission env create --name nodejs --image fission/node-env
 
 3. fission route create --method GET --url /hello --function hello
 
-![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-http.png)
+![](https://github.com/maxwell92/TechTips/blob/master/MTalking/pics/fission-http-seq.png)
 
 通过参数--method指定请求所需方法为GET，--url指定API路由为hello，--function指定对应执行的函数为hello。通过POST请求向/v1/triggers/http发出请求，将路由和函数的映射关系信息发送到controller。controller会在已有的trigger列表里进行重名检查，如果不重复，才会获取UUID并将序列化后的JSON数据写到etcd里。
 
