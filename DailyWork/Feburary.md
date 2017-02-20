@@ -59,6 +59,10 @@
 20170217
 
     [x] 前后联调
-    [ ] ReleaseNote编写
+    [x] ReleaseNote编写
     [x] master更新，QA，生产
+
+20170220
+
+    [x] 确定0.6.5的需求 
 
