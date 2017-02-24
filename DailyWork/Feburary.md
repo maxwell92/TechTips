@@ -87,4 +87,5 @@
 
     [x] fix liveness bug 
     [x] done new check logic
-    [ ] sync queue dedup
+    [x] sync queue dedup
+    [x] sort by name, deployment, template, service
