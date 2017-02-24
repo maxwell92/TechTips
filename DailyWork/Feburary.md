@@ -86,4 +86,5 @@
 20170224
 
     [x] fix liveness bug 
+    [x] done new check logic
     [ ] sync queue dedup
