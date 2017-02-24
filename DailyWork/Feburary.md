@@ -89,3 +89,5 @@
     [x] done new check logic
     [x] sync queue dedup
     [x] sort by name, deployment, template, service
+    [x] fix oldRs bug with empty PodList
+    [ ] errno check
