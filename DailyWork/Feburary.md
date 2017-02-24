@@ -82,3 +82,8 @@
     
     [x] 联调及测试
     [x] QA, Prod
+
+20170224
+
+    [x] fix liveness bug 
+    [ ] sync queue dedup
