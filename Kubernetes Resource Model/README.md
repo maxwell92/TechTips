@@ -33,11 +33,16 @@ Kubernetes的资源模型的理解对Kubernetes的使用者至关重要，它不
 ####  资源分类
 ----------
 
-我们将资源分类进一步细分，可以得到如下分类：
 
- * CPU                        |* 内存    |
- * GPU                        |* 存储空间|
- * I/O时间（Memory/Disk time) |* 网络带宽|
- * 端口号                     |* 高速缓存|
- * IP地址                     |* PIDs    |
+ * CPU
+ * 内存
+ * GPU
+ * 存储空间
+ * I/O时间（Memory/Disk time)
+ * 网络带宽
+ * 端口号
+ * 高速缓存
+ * IP地址
+ * PIDs
+ *
 
