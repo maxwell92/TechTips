@@ -277,9 +277,11 @@ Kubernetes可以使用计算资源的全部，这就引入了一个新的问题�
  * *System-Reserved*: 系统保留的计算资源，不能被Kubernetes调度和使用，它负责/system下所有进程的资源请求。
  * *Kube-Reserved*: Kubernetes为docker,kubelet,kube-proxy等保留的计算资源，这部分保证Kubernetes正常工作。
  * *Kubelet Allocatable*: 能够被Kubernetes调度和使用的计算资源，它的计算方法为：
-    ```bash
+
+```bash
     [Allocatable] = [Node Capacity] - [Kube-Reserved] - [System-Reserved]
-    ```
+```
+
 Scheduler将使用Allocatable替代Capacity作为调度的依据，kubelet也会根据Allocatable进行接纳检查。
 
 用户可以设置Kube-Reserved使用的计算资源，在kubelet的启动选项中指定：
