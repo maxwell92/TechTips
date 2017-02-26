@@ -132,8 +132,7 @@ resourceCapacitySpec: [
 从上面的例子中可以看出，"cpu", "memory"用来作为CPU资源和内存资源的标识，这两个是被Kubernetes保留的字段，用户定义的定义的第三方资源
 不能使用这两个字段。Kubernetes对CPU和Memory两种资源进行了详细的描述：
 
-CPU
--------
+**CPU**
 
  * 名称：cpu或者kubernetes.io/cpu
  * 单位：Kubernetes Compute Unit(KCU) Seconds/second(CPU核数记为"Kubernetes CPU")
@@ -146,8 +145,7 @@ Kubernetes未来会支持两个特性用于细化CPU的使用：
 
 需要注意的是，如果CPU请求需要2个KCU，Kubernetes**不保证**真正申请到2个物理的CPU核心（保证相当于两个物理CPU核心的时间片），这方面的控制会在以后的feature中支持。
 
-Memory
-------
+**Memory**
 
  * 名称：memory或者kubernetes.io/memory
  * 单位：bytes
@@ -228,35 +226,30 @@ Kubelet内置的cAdvisor组件会探测所在节点的计算能力(CPU核数和�
 
 目前Kubernetes支持对CPU/Memory/GPU三种资源的使用，Kubernetes计划将来支持更多的资源类型，比如：
 
-[future]网络带宽
-----
+**[future]网络带宽**
 
  * 名称：network-bandwidth或者kubernetes.io/network-bandwidth
  * 单位：bytes per second(每秒字节数)
  * 是否为可压缩资源：是
 
-[future]存储空间
------
+**[future]存储空间**
 
  * 名称：storage-space或者kubernetes.io/storage-space
  * 单位：bytes
  * 是否为可压缩资源: 否
 
-[future]存储时间
------
+**[future]存储时间**
 
  * 名称：storage-time或者kubernetes.io/storage-time
  * 单位：seconds per second of disk time（每次硬盘时间的秒数）
  * 内部表示：milli-units
  * 是否为可压缩资源：是
 
-[future]存储操作
-------
+**[future]存储操作**
 
  * 名称：storage-iops或者kubernetes.io/storage-iops
  * 单位：operations per second
  * 是否为可压缩资源：是
-
 
 
 ### Node维度的计算资源
