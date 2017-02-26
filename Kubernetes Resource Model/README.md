@@ -293,8 +293,8 @@ Scheduler将使用Allocatable替代Capacity作为调度的依据，kubelet也会
 目前，Kube-Reserved只支持CPU和Memory两种资源，未来会支持更多的资源类型，比如硬盘。如果Kube-Reserved没有设置，那么它
 默认是0，System-Reserved如果不设置，也默认为零，这中情况下`Allocatable == Capacity`，Scheduler会按照Capacity进行调度。
 
-Kube-Reserved的设定不仅仅是为了保证kubelet等组件正常运行，还有限定kubelet使用资源的用意。在某些情况下，用户会使用第三方的资源调度
-组件，比如Mesos，hadoop...等，它们会划分自己的资源范围，这样kubelet和第三方组件可以互不干扰的运行。
+Kube-Reserved的设定不仅仅是为了保证kubelet等组件正常运行，还有限定kubelet使用资源的用意。在某些情况下，用户会使用第三方的资源调度组件，
+比如Mesos，hadoop...等，它们会划分自己的资源范围，这样kubelet和第三方组件可以互不干扰的运行。
 
 System-Reserved默认是Kube-Reserved的值一致，如果Kube-Reserved没有设置，它们默认都为0.
 
