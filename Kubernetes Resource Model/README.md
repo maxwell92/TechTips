@@ -259,10 +259,60 @@ Kubelet内置的cAdvisor组件会探测所在节点的计算能力(CPU核数和�
 
 
 
-### Node资源划分
+### Node维度的计算资源
 ---------------
 
-Kubernetes为每个Node抽象了"Capacity"，它来标识Node能够提供的所有计算资源。
-![](capacity.png)
+#### Node上资源划分划分
+---------------
 
+Node上除了运行Kubernetes创建的容器，还要运行操作系统和一些默认的守护进程，例如Docker daemon和Kubelet daemon等，"Capacity"不能代表
+Kubernetes可以使用计算资源的全部，这就引入了一个新的问题，Kubernetes如何划分Node上的计算资源分配。
+
+如图-2所示,Kubernetes将Node上的计算资源分为三大块:
+
+![图-2](capacity.png)
+
+其中：
+
+ * *System-Reserved*: 系统保留的计算资源，不能被Kubernetes调度和使用，它负责/system下所有进程的资源请求。
+ * *Kube-Reserved*: Kubernetes为docker,kubelet,kube-proxy等保留的计算资源，这部分保证Kubernetes正常工作。
+ * *Kubelet Allocatable*: 能够被Kubernetes调度和使用的计算资源，它的计算方法为：
+    ```bash
+    [Allocatable] = [Node Capacity] - [Kube-Reserved] - [System-Reserved]
+    ```
+Scheduler将使用Allocatable替代Capacity作为调度的依据，kubelet也会根据Allocatable进行接纳检查。
+
+用户可以设置Kube-Reserved使用的计算资源，在kubelet的启动选项中指定：
+
+```bash
+   --kube-reserved=cpu=500m,memory=500Mi
+```
+
+目前，Kube-Reserved只支持CPU和Memory两种资源，未来会支持更多的资源类型，比如硬盘。如果Kube-Reserved没有设置，那么它
+默认是0，System-Reserved如果不设置，也默认为零，这中情况下`Allocatable == Capacity`，Scheduler会按照Capacity进行调度。
+
+Kube-Reserved的设定不仅仅是为了保证kubelet等组件正常运行，还有限定kubelet使用资源的用意。在某些情况下，用户会使用第三方的资源调度
+组件，比如Mesos，hadoop...等，它们会划分自己的资源范围，这样kubelet和第三方组件可以互不干扰的运行。
+
+System-Reserved默认是Kube-Reserved的值一致，如果Kube-Reserved没有设置，它们默认都为0.
+
+### 资源调度与碎片整理
+---------
+
+Node节点经过一段时间的运行，从整体上看计算资源会分成四个区域，如图-3所示：
+
+![图-3](avaliable.png)
+
+A区域用于Scheduler调度新的Pod，但是A区域是不连续空间，整个节点上会形成很多碎片，就像图-4所示：
+
+![图-4](fragment.png)
+
+这时，Node A和Node B不能被Schedule调度资源请求比较大Pod，如果集群中所有的节点都产生碎片后，那么资源请求量大的Pod永远会处于Pending状态，
+应用发布过程会失败。
+
+我们来假设一个场景: 所有Pod的request总量有小于所有Node提供的Capacity总量的时候，说明计算资源充足，但是，这是集群中出现了大量"Pending"的Pod，我们将如何处置？
+
+显而易见的方式就是对Node上的计算资源进行重排，理想的情况，经过重排Node A和Node B的资源使用如下图-5所示：
+
+![图-5](defragment.png)
 
