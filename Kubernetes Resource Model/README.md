@@ -287,7 +287,7 @@ Scheduler将使用Allocatable替代Capacity作为调度的依据，kubelet也会
 用户可以设置Kube-Reserved使用的计算资源，在kubelet的启动选项中指定：
 
 ```bash
-   --kube-reserved=cpu=500m,memory=500Mi
+    --kube-reserved=cpu=500m,memory=500Mi
 ```
 
 目前，Kube-Reserved只支持CPU和Memory两种资源，未来会支持更多的资源类型，比如硬盘。如果Kube-Reserved没有设置，那么它
