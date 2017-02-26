@@ -71,8 +71,6 @@ CPU、GPU属于可压缩的资源，磁盘时间(Disk time)也属于可压缩资
 
 内存、磁盘空间(Disk space)属于不可压缩资源。
 
-这种分类方式便于更好的设计资源模型的QoS和Overcommiting，我们会在下文中详细介绍。
-
 
 #### 资源抽象
 ------------
@@ -97,7 +95,7 @@ Kubernetes将Pod的资源需求和Node资源能力通过设定它们的Spec字�
 
 下面的例子说明了如何定义一个Pod的资源需求：
 
-```json
+```bash
 resourceRequirementSpec: [
   request:   [ cpu: 2.5, memory: "40Mi" ],
   limit:     [ cpu: 4.0, memory: "99Mi" ],
@@ -116,7 +114,8 @@ resourceRequirementSpec: [
 **通过设定request和limit可是实现Kubernetes不同级别的QoS和资源超卖，后面会详细讨论**
 
 下面的例子说明Node上总体资源能力的定义：
-```json
+
+```bash
 resourceCapacitySpec: [
   total:     [ cpu: 12,  memory: "128Gi" ]
 ]
@@ -133,14 +132,28 @@ resourceCapacitySpec: [
 从上面的例子中可以看出，"cpu", "memory"用来作为CPU资源和内存资源的标识，这两个是被Kubernetes保留的字段，用户定义的定义的第三方资源
 不能使用这两个字段。Kubernetes对CPU和Memory两种资源进行了详细的描述：
 
-**CPU**
+CPU
+-------
 
- * 名称： cpu或者kubernetes.io/cpu
- * 单位: Kubernetes Compute Unit(KCU) Seconds/second(CPU核数记为"Kubernetes CPU")
- * 内部表示：milli-KCUs
+ * 名称：cpu或者kubernetes.io/cpu
+ * 单位：Kubernetes Compute Unit(KCU) Seconds/second(CPU核数记为"Kubernetes CPU")
+ * 内部表示: milli-KCUs
  * 是否为可压缩资源：是
 
- 为了
+Kubernetes未来会支持两个特性用于细化CPU的使用：
+ * [future] schedulingLatency: 在[lmctfy](https://github.com/google/lmctfy)（Google开源的虚拟化技术）中设置调度延迟
+ * [future] cpuConversionFactor: 作为Node的属性，用于区分不同Node上的CPU性能，用浮点数表示，默认为1.0
+
+需要注意的是，如果CPU请求需要2个KCU，Kubernetes**不保证**真正申请到2个物理的CPU核心（保证相当于两个物理CPU核心的时间片），这方面的控制会在以后的feature中支持。
+
+Memory
+------
+
+ * 名称：memory或者kubernetes.io/memory
+ * 单位：bytes
+ * 是否为可压缩资源：否
+
+内存的单位支持EB,PB,TB,GB,MB,KB,m的标识方式，也支持2的幂次的标识方式：EiB,PiB,TiB,GiB,MiB,KiB，Kubernetes支持这两种方式是为了照顾用户的使用习惯，两种方式并没有好坏之分。
 
 ##### 资源的量化
 ----------
@@ -184,6 +197,41 @@ Kubernetes将计算资源抽象以"整数"的方式进行量化，让计算资�
   }
 }
 ```
+
+
+#### 其他的资源类型
+-------------
+
+目前（1.5版本）Kubernetes支持对CPU/Memory/GPU三种资源的使用，Kubernetes计划将来支持更多的资源类型，比如：
+
+[future]网络带宽
+----
+
+ * 名称：network-bandwidth或者kubernetes.io/network-bandwidth
+ * 单位：bytes per second(每秒字节数)
+ * 是否为可压缩资源：是
+
+[future]存储空间
+-----
+
+ * 名称：storage-space或者kubernetes.io/storage-space
+ * 单位：bytes
+ * 是否为可压缩资源: 否
+
+[future]存储时间
+-----
+
+ * 名称：storage-time或者kubernetes.io/storage-time
+ * 单位：seconds per second of disk time（每次硬盘时间的秒数）
+ * 内部表示：milli-units
+ * 是否为可压缩资源：是
+
+[future]存储操作
+------
+
+ * 名称：storage-iops或者kubernetes.io/storage-iops
+ * 单位：operations per second
+ * 是否为可压缩资源：是
 
 
 Kubernetes将每个Node的计算资源抽象为"Capacity"，它代表着这个Node提供CPU/Memory等计算资源的总体能力，
