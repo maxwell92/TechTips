@@ -47,7 +47,7 @@ Kubernetes的资源模型的理解对Kubernetes的使用者至关重要，它不
  * PIDs
  * ...
 
-通常，我们称CPU、GPU、内存等为计算资源，它们大体上可分为两类：可压缩资源和不可压缩资源:
+通常，我们称CPU、GPU、内存等为计算资源，它们大体上又可分为两类：可压缩资源和不可压缩资源:
 
 ##### 可压缩资源
 -----------
@@ -55,7 +55,7 @@ Kubernetes的资源模型的理解对Kubernetes的使用者至关重要，它不
 可压缩资源有如下特性：
 
  * 资源本身无状态
- * 申请资源非常快，比如我们创建个进程/线程
+ * 申请资源非常快
  * 回收资源几乎不会失败
 
 CPU、GPU属于可压缩的资源，磁盘时间(Disk time)也属于可压缩资源。
@@ -66,7 +66,7 @@ CPU、GPU属于可压缩的资源，磁盘时间(Disk time)也属于可压缩资
 不可压缩资源有如下特性：
 
  * 资源本身持有状态
- * 申请资源比较慢，比如申请内存，申请一块磁盘空间等
+ * 申请资源相对比较慢
  * 回收资源时可能失败
 
 内存、磁盘空间(Disk space)属于不可压缩资源。
@@ -290,6 +290,12 @@ Kube-Reserved的设定不仅仅是为了保证kubelet等组件正常运行，还
 比如Mesos，hadoop...等，它们会划分自己的资源范围，这样kubelet和第三方组件可以互不干扰的运行。
 
 System-Reserved默认是Kube-Reserved的值一致，如果Kube-Reserved没有设置，它们默认都为0.
+
+在某些场景下，Kubernetes会出现自相矛盾的状况：Scheduler经过调度算法筛选，将Pod与某个Node绑定，Kubelet发现自身的资源不能满足Pod的需求，会拒绝运行这个Pod，
+Scheduler和Kubelet会出现循环依赖的问题，造成Pod永远调度不成功。为了避免这种情况发生，Kubernetes使用"两阶段"的调度策略解决这个问题，
+调度过程分为两个阶段，第一阶段是Schedule经过筛选，选出一些符合的Node，Node根据自身的Capacity对Pod资源请求进行检查，如果满足需求则第一阶段完成，如果不能满足，
+会告诉Scheduler将Pod调度到其他Node；第二阶段，Kubelet会根据Node上的Allocatable再次检查是否能够满足Pod的资源请求，如果满足，Scheduler与Kubelet达成共识，
+Pod会被调度在该Node上，否则，Scheduler会跟其他的Node重复这个过程，知道Pod被成功调度。
 
 #### 资源调度与碎片整理
 ---------
