@@ -91,3 +91,8 @@
     [x] sort by name, deployment, template, service
     [x] fix oldRs bug with empty PodList
     [ ] errno check
+
+20170227
+    
+    [ ] errno check 
+    [ ] watch + cache
