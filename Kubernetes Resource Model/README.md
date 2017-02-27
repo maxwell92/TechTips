@@ -291,11 +291,11 @@ Kube-Reserved的设定不仅仅是为了保证kubelet等组件正常运行，还
 
 System-Reserved默认是Kube-Reserved的值一致，如果Kube-Reserved没有设置，它们默认都为0.
 
-在某些场景下，Kubernetes会出现自相矛盾的状况：Scheduler经过调度算法筛选，将Pod与某个Node绑定，Kubelet发现自身的资源不能满足Pod的需求，会拒绝运行这个Pod，
-Scheduler和Kubelet会出现循环依赖的问题，造成Pod永远调度不成功。为了避免这种情况发生，Kubernetes使用"两阶段"的调度策略解决这个问题，
-调度过程分为两个阶段，第一阶段是Schedule经过筛选，选出一些符合的Node，Node根据自身的Capacity对Pod资源请求进行检查，如果满足需求则第一阶段完成，如果不能满足，
+在某些场景下，Kubernetes会出现自相矛盾的状况：Scheduler经过调度算法筛选，将Pod与某个Node绑定，该Node上Kubelet发现自身的资源不能满足Pod的需求，会拒绝运行这个Pod，
+Scheduler和Kubelet会出现循环依赖的问题，造成Pod永远调度不成功。Kubernetes(1.3以后)使用"两阶段"的调度策略解决这个问题，
+它调度过程分为两个阶段，第一阶段是Schedule经过筛选，选出一些符合的Node，Node根据自身的Capacity对Pod资源请求进行检查，如果满足需求则第一阶段完成，如果不能满足，
 会告诉Scheduler将Pod调度到其他Node；第二阶段，Kubelet会根据Node上的Allocatable再次检查是否能够满足Pod的资源请求，如果满足，Scheduler与Kubelet达成共识，
-Pod会被调度在该Node上，否则，Scheduler会跟其他的Node重复这个过程，知道Pod被成功调度。
+Pod会被调度在该Node上，否则，Scheduler会跟其他的Node重复这个过程，直到Pod被成功调度。
 
 #### 资源调度与碎片整理
 ---------
