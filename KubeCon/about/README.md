@@ -4,6 +4,8 @@ KubeCon视频系列简介
 ### How We Scaled Kubernetes to 2000 Nodes Clusters 
 -----------------------
 
+主讲人是来自Google的Marek Grabowski，分享的主要内容有：
+
 1. 99%的ApiServer的请求都在1秒内结束 
 
 2. 99%的pod调度、创建在5秒内完成 
