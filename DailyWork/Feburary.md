@@ -94,5 +94,9 @@
 
 20170227
     
-    [ ] errno check 
-    [ ] watch + cache
+    [x] errno check : 30%
+    [x] watch + cache: 50%
+
+20170228
+
+    [x] datasource doc
