@@ -80,4 +80,123 @@ $ docker create --name jenkins-k8s csanchez/jenkins-kubernetes
 
 ![](achievingcicd-4.png)
 
-### 
+### *Jenkins*的*Kubernetes*插件设置
+-------------
+
+现在，*Jenkins*已经预先配置好了Kubernetes插件，所以我们直接跳到下一步。使用*Jenkins GUI*，使用*Manage Jenkins > Configure System > Cloud > Add a new Cloud > Kubernetes*。界面如下图中的几个步骤：
+
+![](achievingcicd-5.png)
+
+接下来按照下图的设置进行配置：
+
+![](achievingcicd-6.png)
+
+如果你想使用*Jenkins slave*，可以在*Docker hub*上下载*jnlp-slave*镜像。它提供了简单安装*Slave*节点的模板。你可以通过创建模板来配置一个*Slave*节点，如下图所示：
+
+![](achievingcicd-7.png)
+
+为了让*Jenkins slave*能参与任务调度，当在*Jenkins*上创建一个任务的时候，向下图所示设置你的任务：
+
+![](achievingcicd-8.png)
+
+现在只需把Kubernetes Pod模板中的标签的名称放在*restrict*部分，保存并应用新的设置。当构建此*Job*时，会看到*Slave*上运行这个*Job*。
+
+一切准备就绪了！你现在可以根据需要添加更多的插件。
+
+### Fabric8
+-------------
+
+*Fabric8*是一个基于*Docker*，*Kubernetes*和*Jenkins*的开源微服务平台。 它是由*Red Hat*创建的。 该项目的目的是通过持续交流水线轻松创建，构建，测试和部署微服务，然后使用持续改进和ChatOps运行和管理它们。
+
+*Fabric8*会自动安装并配置一下内容：
+
+ * [Jenkins](https://jenkins.io/)
+
+ * [Gogs](https://gogs.io/)
+
+ * Fabric8 registry
+
+ * [Nexus](https://wiki.jenkins-ci.org/display/JENKINS/Nexus+Artifact+Uploader)
+
+ * [SonarQube](http://sonarqube.org/)
+
+ 下图是*Fabric8*的架构图：
+
+![](achievingcicd-9.png)
+
+为了开始我们的演示，你需要使用命令行工具安装[Fabric8](http://fabric8.io/)(gofabric8)。[下载gofabric8](https://github.com/fabric8io/gofabric8/releases)，解压之后运行命令：
+
+```bash
+$ sudo cp /usr/local/bin/ gofabric8
+```
+
+在终端上检查`$ gofabric8`命令是否安装成功：
+
+```bash
+$ gofabric8 deploy -y
+```
+运行命令后，终端上会显示：
+
+![](achievingcicd-10.png)
+
+创建秘钥：
+
+```bash
+$ gofabric8 secrets -y
+```
+
+终端返回：
+
+![](achievingcicd-11.png)
+
+使用`kubectl`查看*pod*运行状态:
+
+![](achievingcicd-12.png)
+
+你可以使用*Kubernetes Dashboard*提供的页面查看所有Pod的状态，打开浏览器，输入：*http://192.168.99.100:30000*:
+
+![](achievingcicd-14.png)
+
+相似的，可以打开*Fabric8*的页面：
+
+![](achievingcicd-15.png)
+
+我们来分析一下上面的命令的执行过程，可以通过一个工作流图展示：
+
+![](achievingcicd-16.png)
+
+### 实现CI/CD
+----------------
+
+说起来容易做起来难。从源头构建*Jenkins*并整合*Kubernetes*实现持续集成(*CI*)仅仅是故事的一部分，但是实现持续发布(*CD*)时另外一个非常不同而且更加复杂的故事了。
+
+这里有一些关于使用*Jenkins*插件的技巧，他们能帮你更加容易地实现*Jenkins*的持续交付。
+
+####  Pipeline Plugin
+---------------------
+[Pipeline](https://jenkins.io/solutions/pipeline/)是由*Jenkins*社区构建的核心插件。此插件确保任何编排引擎与你的环境集成，而且复杂性很低。目前，我相信这仅仅是个开始，因为不同的社区已经为这种引擎构建不同的插件，这些插件都围绕*Jenkins UI*展开。使用*Pipeline*插件，用户可以在*Jenkinsfile*中实现他们项目的整个构建/测试/部署的流水线，并将这个文件跟代码存储在一起，作为代码的一部分放进代码控制中。
+
+#### GitHub Plugin
+---------------------
+
+这些天，大多数工作都使用*GitHub*作为源代码管理(*SCM*)工具。我建议你使用*GitHub*插件，它可以帮助你的*Jenkins*从*GitHub*拉取代码，并分析和测试。为了实现鉴权访问，我建议你看看*GitHub OAuth*插件。
+
+#### Docker Plugin
+---------------------
+
+对于*Docker*来说，这是最适合的插件之一，帮助你做几乎一切与Docker有关的事情。 这个插件还能帮助你使用Docker容器作为*Jenkins Slave*节点。还有几个其他的Docker插件，根据时间和你的用法，可以在它们之间切换。
+
+#### AWS Pipeline
+---------------------
+
+*AWS*人员推出了一个名为[*AWS Pipeline*](https://wiki.jenkins-ci.org/display/JENKINS/AWS+CodePipeline+Plugin)的超棒的服务。 此特定服务可帮助您使用AWS实现持续交付。 目前，这个插件正在大量开发，可能不适合生产环境。 另外，可以查看[AWS CodeCommit](https://wiki.jenkins-ci.org/display/JENKINS/CodeCommit+URL+Helper)关注进度。
+
+#### OpenStack
+---------------------
+对于*OpenStack*用户，*OpenStack*插件适合使用*OpenStack*的环境配置。
+
+#### Google Cloud Platform
+---------------------
+
+可以在*Google Cloud Platform*上提供了部署管理器，使用部署管理器，你可以创建灵活的声明性模板，这些模板可以部署各种云平台，例如*Google Cloud Storage*, *Google Compute Engine*和*Google Cloud SQL*。部署管理器还可以将资源的使用定义存储在发布模板中。这是一个非常新的插件，但是我认为他是一个值得尝试好工具，如果你希望实现自动化和*Google*的云服务。
+
