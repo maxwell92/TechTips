@@ -13,3 +13,7 @@
 20170303
 
     [x] 测试数据源文件相关controller和user story
+
+20170306
+    
+    [x] 借助Cache刷新应用列表
