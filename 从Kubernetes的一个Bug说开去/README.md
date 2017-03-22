@@ -357,7 +357,7 @@ func main() {
 }
 ```
 
-我们使用现有的*Deployment*导出Json，然后将他们反序列号成*Kubernetes Deployment*对象，两个对象之间只有*Spec.Template.Contaienr[0]*不同，也就是说只是镜像名称不同，旧的是*img.reg.3g:15000/yce-alpha:201703151133*，要升级的镜像是*img.reg.3g:15000/yce-alpha:201703151133*。执行结果如下：
+我们使用现有的*Deployment*导出Json，然后将他们反序列号成*Kubernetes Deployment*对象，两个对象之间只有*Spec.Template.Contaienrs[0]*不同，也就是说只是镜像名称不同，旧的是*img.reg.3g:15000/yce-alpha:201703151133*，要升级的镜像是*img.reg.3g:15000/yce-alpha:201703151133*。执行结果如下：
 
 ```bash
 go run hasher.go
