@@ -63,6 +63,7 @@ spec:
 下面的表格显示不同的云提供商预安装的默认*StorageClasses*：
 
 | 云提供商 | 默认*StorageClasses Name* | 默认存储 |
+|----------|---------------------------|----------|
 | Amazon Web Services | gp2 | aws-ebs | aws-ebs |
 | Microsoft Auzer | standard | azure-disk |
 | Google Cloud Platform | standard | gcd-pd |
