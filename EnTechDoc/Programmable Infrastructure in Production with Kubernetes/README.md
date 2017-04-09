@@ -5,12 +5,12 @@
 ![](0-JZg9Fa9GYYTFbMNU.jpg)
 
 
-> 这周我们聊聊自动化的与可编程的基础设施并且列举一个真实的例子。我们将继续使用*Mircobadger*服务，通过我们自己定义的调度器实现部分自动化。我们调度程序的代码是开源的，可以从*[https://github.com/microscaling/microscaling](https://github.com/microscaling/microscaling)*上获取。它可以使用*Kubernetes*的*Deployment API*来扩展。
+> 这周我们聊聊自动化的与可编程的基础设施并且列举一个真实的例子。我们将继续使用*Mircobadger*服务，通过我们自己定义的调度器实现部分自动化。我们调度程序的代码是开源的，可以从[https://github.com/microscaling/microscaling](https://github.com/microscaling/microscaling)上获取。它可以使用*Kubernetes*的*Deployment API*来扩展。
 
 ### *Microbadger*做什么
 ------------------
 
-*Microbadger*是个*SaaS*服务，可以让您浏览*Docker Hub*上的任何公共图像的元数据。您提供镜像的名称，我们会从*Docker Hub*获取数据，整理并显示出来。
+*Microbadger*是个*SaaS*服务，可以让您浏览*Docker Hub*上的任何公共镜像的元数据。您提供镜像的名称，我们会从*Docker Hub*获取数据，整理并显示出来。
 
 ### *Microbadger*如何工作
 ------------------
