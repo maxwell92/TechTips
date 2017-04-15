@@ -44,7 +44,7 @@ affinity:
 #### 首选的规则
 ----------------------
 
-首选规则意味着如果节点与规则匹配，则将优先选择它们，并且仅当没有优选节点可用时才选择非优选节点。 您可以选择使用**首选**规则，而不是通过**必需**规则强制将*Pod*部署到我们在*GCE*的`us-central1-a`区域的节点上。选择首选规则，则需使用`preferredDuringSchedulingIgnoredDuringExecution`：
+首选规则意味着如果节点与规则匹配，则将优先选择它们，并且仅当没有优选节点可用时才选择非优选节点。 您可以选择使用**首选**规则，而不是通过**必需**规则强制将*Pod*部署到*GCE*的`us-central1-a`区域中的节点上。使用首选规则，则需指定`preferredDuringSchedulingIgnoredDuringExecution`：
 
 ```yaml
 affinity:
