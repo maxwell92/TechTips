@@ -90,4 +90,112 @@ kubectl taint nodes node1 key=value:NoSchedule
 
 创建一个污点并标记到*Node*，那些没有设置容忍的*Pod*（通过*key-value*方式设置*NoSchedule*，这是其中一个选项）不能调度到该*Node*上。其他污点的选项是*PerferredNoSchedule*，这是*NoSchedule*首选版本；还有*NoExecute*，这个选项意味着在当*Node*被标记有污点时，该*Node*上运行的任何没有设置容忍的*Pod*都将被驱逐。容忍将被添加到*PodSpec*中，看起来像这样：
 
+```yaml
+tolerations: 
+  - key: "key"
+    operator: "Equal"
+    value: "value"
+    effect: "NoSchedule"
 ```
+
+除了将污点和容忍(*Taints and Tolerations*)特性在*Kubernetes 1.6*中移至*Beta*版外，我们还引入了一个使用污点和容忍的*Alpha*的特性：允许用户自定义一个*Pod*被绑定到*Node*上后遇到了诸如网络分区的问题时的行为（可能*Pod*希望长时间允许在这个*Node*上，或者网络分区会很快恢复），而不是现在默认的等待五分钟超时。更详细的信息，请参阅[文档](https://kubernetes.io/docs/user-guide/node-selection/#per-pod-configurable-eviction-behavior-when-there-are-node-problems-alpha-feature)。
+
+
+### *Pod*的亲和性和反亲和性
+------------------------
+
+*Node*的亲和性和反亲和性允许您基于节点的标签来限制*Pod*的调度行为。但是，如果您想要指定*Pod*的亲和关系时这种方法就无法奏效了。例如，如何实现在一个服务或者相关的服务中聚合*Pod*或将Pod均匀分布？为此，您可以使用*Pod*的亲和性和反亲和性特性，它在*Kubernetes 1.6*中也是*Beta*版。
+
+我们来看一个例子。假设您在服务*S1*中有个前端应用，它经常与服务*S2*的后端应用进行通信。因此，您希望这两个服务共同位于同一个云提供商的区域中，但您不需要手动选择区域（如果有些区域暂时不可用），希望将*Pod*重新调度到另一个（单个的）区域。您可以像这样指定*Pod*的亲和性和反亲和性规则（假设您将该服务的*Pod*命名为*”service=S2"*，另外一个服务的*Pod*为*"service=S1"）：
+
+```yaml
+affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: service
+            operator: In
+            values: [“S1”]
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+```
+
+如同*Node*的亲和性和反亲和性，也有一个`preferredDuringSchedulingIgnoredDuringExecution`变量。
+
+*Pod*的亲和性和反亲和性非常灵活。想象一下，您已经分析了您的服务的性能，发现来自服务*S1*的容器会干扰运行在同一*Node*上的服务*S2*的容器，这可能是由于缓存干扰效应或者网络连接饱和引起，或者也许是由于安全性问题，您不会想要*S1*和*S2*的容器共享一个*Node*。要实现这些规则，只需对上述代码段进行两次更改即可将*podAffinity*更改为*podAntiAffinity"，并将*topologyKey*更改为*kubernetes.io/hostname*即可。
+
+### 自定义调度器
+-------------------
+
+如果*Kubernetes Scheduler*的这些特性没能足够满足您控制负载的需求，您可以在将任意子集的*Pod*的调度任务交给您自己的自定义调度器，自定义的调度器可以跟默认的调度器（*Kubernetes Scheduler*）一起运行，或者替代默认的调度器。[多调度器(*Multiple schedulers*)](https://kubernetes.io/docs/admin/multiple-schedulers/)在*Kubernetes 1.6*中是*Beta*版。
+
+在默认的情况下，每个新的*Pod*都使用默认的调度器进行调度。但是如果您提供了自定义调度器的名称，默认的调度器会忽略*Pod*的调度请求，允许您的自定义调度器对*Pod*进行调度。看看下面的例子：
+
+在Pod的规范(*Spec*)中制定调度器的名字：
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  schedulerName: my-scheduler
+  containers:
+  - name: nginx
+    image: nginx:1.10
+```
+
+如果我们在没有部署自定义调度器的情况下创建了这个*Pod*，结果会是默认的调度器将忽略这个*Pod*，它将处于*Pending*状态。因此，我们需要一个自定义调度程序来查找和调度其*schedulerName*字段为*my-scheduler*的*Pod8*。
+
+自定义调度语言可以用任何语言编写，调度策略根据需要可以简单也可以复杂。这是一个非常简单的例子，它使用*Bash*编写，它可以为*Pod*随机分配一个*Node*。请注意，您需要让它与*kubectl proxy*一起运行：
+
+```bash
+#!/bin/bash
+SERVER='localhost:8001'
+while true;
+do
+    for PODNAME in $(kubectl --server $SERVER get pods -o json | jq '.items[] | select(.spec.schedulerName == "my-scheduler") | select(.spec.nodeName == null) | .metadata.name' | tr -d '"')
+;
+    do
+        NODES=($(kubectl --server $SERVER get nodes -o json | jq '.items[].metadata.name' | tr -d '"'))
+        NUMNODES=${#NODES[@]}
+        CHOSEN=${NODES[$[ $RANDOM % $NUMNODES ]]}
+        curl --header "Content-Type:application/json" --request POST --data '{"apiVersion":"v1", "kind": "Binding", "metadata": {"name": "'$PODNAME'"}, "target": {"apiVersion": "v1", "kind"
+: "Node", "name": "'$CHOSEN'"}}' http://$SERVER/api/v1/namespaces/default/pods/$PODNAME/binding/
+        echo "Assigned $PODNAME to $CHOSEN"
+    done
+    sleep 1
+done
+```
+
+*Kubernetes 1.6*的[*release notes*](https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG.md#v160)关于这个特性有更多的介绍，包括您已经使用了这些（其中一个或者多个）特性的*Alpha*版本改如何进行配置的细节（这些事必需的，因为对于这些特性，从*Alpha*到*Beta*的转变是突破性的）。
+
+### 致谢
+----------------------
+
+这里描述的功能，包括*Alpha*和*Beta*版本，都是社区的工程师的努力，他们来自*Google*, *Huawei*, *IBM*, *Rad Hat*等公司。
+
+### 加入我们
+------------------
+
+通过每周的[社区会议](https://github.com/kubernetes/community/blob/master/communication.md#weekly-meeting)发出您的声音：
+
+* 在[*Stack Overflow*](http://stackoverflow.com/questions/tagged/kubernetes)上提问或者回答问题
+
+* 在*Twitter*关注我们[*@Kubernetesio*](https://twitter.com/kubernetesio)
+
+* 在[*Slack*](http://slack.k8s.io/)(room: #sig-scheduling )上参与社区的讨论
+
+
+非常感谢您所做的贡献！
+
+作者：
+
+--Ian Lewis, Developer Advocate, and David Oppenheimer, Software Engineer, Google
+
+
+原文链接：
+
+http://blog.kubernetes.io/2017/03/advanced-scheduling-in-kubernetes.html
